@@ -1,4 +1,4 @@
- import React from "react";
+ import React, { useEffect } from "react";
 
 import {
   Package,
@@ -8,8 +8,18 @@ import {
   Phone,
   MessageCircle
 } from "lucide-react";
+import { useAppContext } from "../../context/Context";
 
 const Order = () => {
+  const { order,productQuantity,cart } = useAppContext();
+
+  
+
+  useEffect(() => {
+    console.log(localStorage.getItem("orders"))
+  }, [order]);
+ 
+
   return (
 
     <div className="p-4 sm:p-6">
@@ -31,179 +41,138 @@ const Order = () => {
 
       {/* ORDER LIST */}
 
-      <div className="space-y-5">
+ 
+{
+  order.map((item) => (
+    
 
-        {/* ORDER CARD */}
+    <div key={item.id} className="space-y-5">
 
-        <div className="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
+      <div className="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
 
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
 
-            {/* LEFT */}
+          {/* LEFT */}
 
-            <div className="flex items-start gap-4">
+          <div className="flex items-start gap-4">
 
-              <div className="bg-emerald-100 p-4 rounded-2xl">
+            <div className="bg-emerald-100 p-4 rounded-2xl">
 
-                <Package className="text-emerald-700" />
-
-              </div>
-
-              <div>
-
-                <h2 className="text-xl font-semibold text-gray-800">
-                  Fresh Tomatoes
-                </h2>
-
-                <p className="text-gray-500 mt-1">
-                  Ordered by: Rahul Sharma
-                </p>
-
-                <p className="text-gray-500">
-                  Quantity: 25 KG
-                </p>
-
-                <p className="text-gray-500">
-                  Total Amount: ₹1000
-                </p>
-
-              </div>
+              <Package className="text-emerald-700" />
 
             </div>
 
+            <div>
 
-            {/* STATUS */}
+              {/* BUYER NAME */}
 
-            <div className="flex flex-wrap gap-3">
+              <h2 className="text-xl font-semibold text-gray-800">
+                {item.name}
+              </h2>
 
-              <div className="flex items-center gap-2 bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl">
+              {/* PHONE */}
 
-                <Clock3 size={18} />
+              <p className="text-gray-500 mt-1">
+                Phone: {item.phone}
+              </p>
 
-                Pending
+              {/* ADDRESS */}
 
-              </div>
+              <p className="text-gray-500">
+                Address: {item.address}
+              </p>
+
+              {/* UNIT */}
+
+              <p className="text-gray-500">
+                Unit: {item.unit}
+              </p>
+
+              {/* TOTAL */}
+
+              <p className="text-gray-500">
+                Total Amount: ₹{item.totalPrice}
+              </p>
+
+              {/* DATE */}
+
+              <p className="text-gray-500">
+                Date: {item.orderdate}
+              </p>
 
             </div>
 
           </div>
 
+          {/* STATUS */}
 
-          {/* ACTION BUTTONS */}
+          <div className="flex flex-wrap gap-3">
 
-          <div className="flex flex-wrap gap-3 mt-5">
+            <div className="flex items-center gap-2 bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl">
 
-            <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl transition">
+              <Clock3 size={18} />
 
-              Accept Order
+              {item.status}
 
-            </button>
-
-            <button className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl transition">
-
-              Reject
-
-            </button>
-
-            <a
-              href="tel:9876543210"
-              className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl transition"
-            >
-
-              <Phone size={18} />
-
-              Call Buyer
-
-            </a>
-
-            <a
-              href="https://wa.me/919876543210"
-              target="_blank"
-              className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-xl transition"
-            >
-
-              <MessageCircle size={18} />
-
-              WhatsApp
-
-            </a>
+            </div>
 
           </div>
 
         </div>
 
 
-        {/* ORDER CARD */}
+        {/* CART ITEMS */}
 
-        <div className="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
+        <div className="mt-5">
 
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+          <h3 className="font-semibold mb-3">
+            Products
+          </h3>
 
-            {/* LEFT */}
+          {
+            item.cart.map((product) => (
 
-            <div className="flex items-start gap-4">
+              <div
+                key={product.id}
+                className="flex items-center gap-4 border-b py-3"
+              >
 
-              <div className="bg-orange-100 p-4 rounded-2xl">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-16 h-16 rounded-xl object-cover"
+                />
 
-                <Truck className="text-orange-500" />
+                <div>
 
-              </div>
+                  <p className="font-medium">
+                    {product.name}
+                  </p>
 
-              <div>
+                  <p className="text-gray-500">
+                    ₹{product.price}
+                  </p>
 
-                <h2 className="text-xl font-semibold text-gray-800">
-                  Organic Potatoes
-                </h2>
+                  <p className="text-gray-500">
+                    Qty: {product.buyQty}
+                  </p>
 
-                <p className="text-gray-500 mt-1">
-                  Ordered by: Priya Patil
-                </p>
-
-                <p className="text-gray-500">
-                  Quantity: 50 KG
-                </p>
-
-                <p className="text-gray-500">
-                  Total Amount: ₹1500
-                </p>
-
-              </div>
-
-            </div>
-
-
-            {/* STATUS */}
-
-            <div className="flex flex-wrap gap-3">
-
-              <div className="flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-xl">
-
-                <CheckCircle size={18} />
-
-                Delivered
+                </div>
 
               </div>
 
-            </div>
-
-          </div>
-
-
-          {/* ACTIONS */}
-
-          <div className="flex flex-wrap gap-3 mt-5">
-
-            <button className="bg-gray-200 text-gray-700 px-5 py-2 rounded-xl">
-
-              View Details
-
-            </button>
-
-          </div>
+            ))
+          }
 
         </div>
 
       </div>
+
+    </div>
+
+  ))
+}
+      
 
     </div>
 

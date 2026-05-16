@@ -32,10 +32,15 @@ const UserNav = () => {
       <div className='flex items-center gap-4'>
 
          
+        <div className=' p-2 rounded-full'>
+                  <Search />
+                </div>
 
         <div className='bg-emerald-100 p-2 rounded-full'>
           <User className='text-emerald-700' />
         </div>
+
+        
 
       </div>
 

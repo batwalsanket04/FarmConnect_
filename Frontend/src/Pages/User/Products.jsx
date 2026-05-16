@@ -35,7 +35,7 @@ const Products = () => {
                 <p className='text-sm text-gray-500 mt-1'>{product.description}</p>
 
                 <div className='flex items-center justify-between mt-4'>
-                  <p className='text-emerald-700 font-bold text-lg'>₹{product.price}/kg</p>
+                  <p className='text-emerald-700 font-bold text-lg'>₹{(product.price || 0)}/kg</p>
 
                   <button
                     onClick={() => {
@@ -44,7 +44,7 @@ const Products = () => {
                     }}
                     className='bg-emerald-600 text-white px-4 py-2 rounded-lg'
                   >
-                    Buy
+                    add to cart
                   </button>
                 </div>
               </div>

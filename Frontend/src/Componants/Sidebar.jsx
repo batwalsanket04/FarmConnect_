@@ -10,14 +10,15 @@ import {
   Menu,
   X,
   Bell,
-  Search
+  Search,
+  Home
 } from 'lucide-react'
 
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAppContext } from '../context/Context'
 
 const Sidebar = ({ type = "farmer" }) => {
-  const {cart}=useAppContext();
+  const {cart ,productQuantity}=useAppContext();
 
   const [open, setOpen] = useState(false)
 
@@ -93,7 +94,7 @@ const Sidebar = ({ type = "farmer" }) => {
           {/* DASHBOARD */}
 
           <button
-            onClick={() => navigate('/farmer-dashboard')}
+          onClick={()=>navigate(-1)}
             className='w-full flex items-center gap-3 bg-white text-emerald-700 px-4 py-3 rounded-xl font-semibold shadow-md'
           >
 
@@ -134,7 +135,7 @@ const Sidebar = ({ type = "farmer" }) => {
 
 
               <button
-                onClick={() => navigate('order')}
+              onClick={() => navigate('/farmer-dashboard/order')}
                 className='w-full flex items-center gap-3 hover:bg-emerald-600 px-4 py-3 rounded-xl transition-all duration-300'
               >
 
@@ -152,17 +153,26 @@ const Sidebar = ({ type = "farmer" }) => {
 
           {type === "user" && (
             <>
+             <button  onClick={()=>navigate("/user-dashboard")} className='w-full flex items-center gap-3 hover:bg-emerald-600 px-4 py-3 rounded-xl transition-all duration-300'>
 
-              <button onClick={()=>navigate('cart')} className='w-full flex items-center gap-3 hover:bg-emerald-600 px-4 py-3 rounded-xl transition-all duration-300'>
+                <Home size={20} />
+
+                Home
+
+              </button>
+
+            
+
+              <button onClick={()=>navigate('/user-dashboard/cart')} className='w-full flex items-center gap-3 hover:bg-emerald-600 px-4 py-3 rounded-xl transition-all duration-300'>
 
                 <ShoppingCart size={20} />
 
                 Cart
                 {cart.length > 0 && (
-        <span className='ml-auto bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center'>
-          {cart.reduce((acc, item) => acc + item.Quantity, 0)}
-        </span>
-      )}
+  <span className='ml-auto bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center'>
+    {cart.length}
+  </span>
+)}
 
               </button>
 
@@ -175,13 +185,7 @@ const Sidebar = ({ type = "farmer" }) => {
               </button>
 
 
-              <button className='w-full flex items-center gap-3 hover:bg-emerald-600 px-4 py-3 rounded-xl transition-all duration-300'>
-
-                <Search size={20} />
-
-                Search
-
-              </button>
+              
 
 
               <button className='w-full flex items-center gap-3 hover:bg-emerald-600 px-4 py-3 rounded-xl transition-all duration-300'>

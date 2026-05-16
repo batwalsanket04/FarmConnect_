@@ -1,285 +1,340 @@
-import React from "react";
+import React, { useState } from "react";
+import { Trash2, ShoppingCart, ArrowLeft, Check } from "lucide-react";
 
-import {
-  Minus,
-  Plus,
-  Trash2,
-  ShoppingCart
-} from "lucide-react";
-
-import { useAppcontext } from "../../Context/AppContext";
+import { useAppContext } from "../../context/Context";
+import { useNavigate } from "react-router-dom";
+import CartItem from "../../Componants/Cart/cartItem";
+import OrderSummary from "../../Componants/Cart/orderSummery";
+import SuccessPage from "../../Componants/Cart/successPage";
 
 const Cart = () => {
+  const {
+    cart,
+    setCart,
+    order,
+    setOrder,
+    productQuantity,
+    setProductQuantity,
+  } = useAppContext();
+  const navigate = useNavigate();
+  const [checkout, setCheckout] = useState(false);
 
-  const { cart, setCart } = useAppcontext();
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    address: "",
+    unit: "",
+    payment: "",
+  });
 
+  const [success, setSuccess] = useState(false);
 
-  /* INCREASE QTY */
+  const [unit, setUnit] = useState("kg");
 
-  const increaseQty = (id) => {
+  const quintalPrice = cart.reduce((total, item) => {
+    return total + item.price * (productQuantity[item.id] || 1) * 100;
+  }, 0);
 
-    setCart(
-
-      cart.map(item =>
-
-        item.id === id
-
-          ? { ...item, qty: item.qty + 1 }
-
-          : item
-
-      )
-
-    )
-
-  }
-
-
-  /* DECREASE QTY */
-
-  const decreaseQty = (id) => {
-
-    setCart(
-
-      cart
-        .map(item =>
-
-          item.id === id
-
-            ? { ...item, qty: item.qty - 1 }
-
-            : item
-
-        )
-
-        .filter(item => item.qty > 0)
-
-    )
-
-  }
-
-
-  /* REMOVE ITEM */
-
+  // REMOVE ITEM
   const removeItem = (id) => {
+    setCart(cart.filter((item) => item.id !== id));
+  };
 
-    setCart(
+  // TOTAL PRICE
+  const totalPrice = cart.reduce(
+    (total, item) => total + item.price * (productQuantity[item.id] ||1 ),
+    0,
+  );
 
-      cart.filter(item => item.id !== id)
+  const quantityHandle = (id, value) => {
+    setProductQuantity({
+      ...productQuantity,
+      [id]: Number(value),
+    });
+  };
 
-    )
+  // FORM HANDLE
 
+  const formHandle = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // SUCCESS PAGE
+  if (success) {
+    return (
+      <SuccessPage
+        setSuccess={setSuccess}
+        setCheckout={setCheckout}
+        navigate={navigate}
+      />
+    );
   }
 
+  // CHECKOUT PAGE
+  if (checkout) {
+    return (
+      <form className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 p-4 sm:p-6">
+        {/* BACK BUTTON */}
+        <button
+          onClick={() => setCheckout(false)}
+          className="flex items-center gap-2 text-emerald-700 font-semibold mb-6"
+        >
+          <ArrowLeft size={20} />
+          Back
+        </button>
 
-  /* TOTAL */
+        <div className="max-w-2xl mx-auto bg-white rounded-3xl shadow-md p-6 sm:p-8">
+          <h1 className="text-3xl font-bold text-emerald-700 mb-8">
+            Checkout Details
+          </h1>
 
-  const totalPrice = cart.reduce(
+          {/* BUYER NAME */}
+          <div className="mb-5">
+            <label className="block mb-2 font-semibold text-gray-700">
+              Buyer Name
+            </label>
 
-    (total, item) => total + item.price * item.qty,
+            <input
+              type="text"
+              onChange={formHandle}
+              value={form.name}
+              name="name"
+              placeholder="Enter your name"
+              className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-emerald-500"
+            />
+          </div>
 
-    0
+          {/* PHONE */}
+          <div className="mb-5">
+            <label className="block mb-2 font-semibold text-gray-700">
+              Phone Number
+            </label>
 
-  )
+            <input
+              type="text"
+              value={form.phone}
+              onChange={formHandle}
+              name="phone"
+              placeholder="Enter phone number"
+              className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-emerald-500"
+            />
+          </div>
 
+          {/* ADDRESS */}
+          <div className="mb-5">
+            <label className="block mb-2 font-semibold text-gray-700">
+              Delivery Address
+            </label>
 
+            <textarea
+              rows="4"
+              onChange={formHandle}
+              name="address"
+              value={form.address}
+              placeholder="Enter full address"
+              className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none resize-none focus:border-emerald-500"
+            ></textarea>
+          </div>
+
+          {/* QUANTITY + UNIT */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+            {/* QUANTITY */}
+            {cart.map((item) => (
+              <div key={item.id} className="mt-4 flex items-center gap-3">
+                <input
+                  type="number"
+                  min="1"
+                  placeholder="Qty"
+                  value={productQuantity[item.id] || ""}
+                  onChange={(e) => quantityHandle(item.id, e.target.value)}
+                  className="border border-gray-300 rounded-xl px-3 py-2 w-24 outline-none focus:border-emerald-500"
+                />
+
+                <span className="font-semibold text-gray-600">
+                  {item.name} ({form.unit || "kg"})
+                </span>
+              </div>
+            ))}
+            {/* UNIT */}
+            <div>
+              <label className="block mb-2 font-semibold text-gray-700">
+                Unit
+              </label>
+
+              <select
+               
+                name="unit"
+                value={form.unit}
+                onChange={formHandle}
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-emerald-500"
+              >
+                <option value="kg">Kilogram (KG)</option>
+
+                <option value="quintal">Quintal</option>
+              </select>
+            </div>
+          </div>
+
+          {/* PAYMENT */}
+          <div name className="mb-6">
+            <label className="block mb-3 font-semibold text-gray-700">
+              Payment Method
+            </label>
+
+            <div className="space-y-3">
+              <label className="flex items-center gap-3 border rounded-xl p-4 cursor-pointer hover:border-emerald-500">
+                <input
+                  type="radio"
+                  name="payment"
+                  onChange={formHandle}
+                  value="COD"
+                />
+                Cash On Delivery
+              </label>
+
+              <label className="flex items-center gap-3 border rounded-xl p-4 cursor-pointer hover:border-emerald-500">
+                <input
+                  type="radio"
+                  name="payment"
+                  onChange={formHandle}
+                  value="UPI"
+                />
+                UPI Payment
+              </label>
+            </div>
+          </div>
+
+          {/* ORDER FLOW */}
+          <div className="bg-emerald-50 rounded-2xl p-5 mb-6 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-gray-600 font-medium">Products</p>
+
+             <p className="font-semibold">
+  {
+    Object.values(productQuantity).reduce(
+      (total, qty) => total + qty,
+      0
+    )
+  }
+</p>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <p className="text-gray-600 font-medium">Buying Unit</p>
+
+              {form.unit === "kg" ? (
+                <p className="font-semibold uppercase">{form.unit}</p>
+              ) : (
+                <p className="font-semibold uppercase">{form.unit}</p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between">
+              <p className="text-gray-600 font-medium">Delivery</p>
+
+              <p className="font-semibold text-emerald-700">Free</p>
+            </div>
+
+            <hr />
+
+            <div className="flex items-center justify-between">
+              <p className="text-xl font-bold text-gray-800">Total Amount</p>
+
+              {form.unit == "quintal" ? (
+                <h2 className="text-3xl font-bold text-emerald-700">
+                  ₹{quintalPrice}
+                </h2>
+              ) : (
+                <h2 className="text-3xl font-bold text-emerald-700">
+                  ₹{totalPrice}
+                </h2>
+              )}
+            </div>
+          </div>
+
+          {/* PLACE ORDER */}
+          <button
+          type="submit"
+            onClick={(e) => {
+              e.preventDefault();
+
+              const orderData = {
+                id: Date.now(),
+                ...form,
+                cart: cart.map((item) => ({
+                  ...item,
+                  buyQty: productQuantity[item.id] || 0,
+                })),
+                totalPrice,
+                status: "pending",
+                orderdate: new Date().toLocaleDateString(),
+              };
+              console.log(orderData);
+             setOrder((prev) => [...prev, orderData]);
+             setSuccess(true)
+               
+            }}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-semibold text-lg transition"
+          >
+            Place Order
+          </button>
+        </div>
+      </form>
+    );
+  }
+
+  // CART PAGE
   return (
-
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 p-4 sm:p-6">
-
       {/* TITLE */}
-
       <div className="flex items-center gap-3 mb-8">
+        <ShoppingCart className="text-emerald-700" size={32} />
 
-        <ShoppingCart
-          className="text-emerald-700"
-          size={32}
-        />
-
-        <h1 className="text-3xl font-bold text-emerald-700">
-          My Cart
-        </h1>
-
+        <h1 className="text-3xl font-bold text-emerald-700">My Cart</h1>
       </div>
 
-
       {/* EMPTY CART */}
-
       {cart.length === 0 ? (
-
         <div className="bg-white rounded-3xl shadow-md p-10 text-center">
-
-          <ShoppingCart
-            className="mx-auto text-gray-300"
-            size={60}
-          />
+          <ShoppingCart className="mx-auto text-gray-300" size={60} />
 
           <h2 className="text-2xl font-semibold text-gray-600 mt-4">
             Cart is Empty
           </h2>
-
         </div>
-
       ) : (
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          {/* CART ITEMS */}
-
+          {/* PRODUCTS */}
           <div className="lg:col-span-2 space-y-5">
-
-            {
-
-              cart.map(item => (
-
-                <div
-                  key={item.id}
-                  className="bg-white rounded-3xl shadow-md p-4 flex flex-col sm:flex-row gap-5"
-                >
-
-                  {/* IMAGE */}
-
-                  <img
-                    src={item.image}
-                    alt=""
-                    className="w-full sm:w-40 h-40 object-cover rounded-2xl"
-                  />
-
-
-                  {/* DETAILS */}
-
-                  <div className="flex-1">
-
-                    <div className="flex items-start justify-between">
-
-                      <div>
-
-                        <h2 className="text-2xl font-bold text-gray-800">
-                          {item.name}
-                        </h2>
-
-                        <p className="text-emerald-700 font-semibold mt-1">
-                          ₹{item.price}/kg
-                        </p>
-
-                      </div>
-
-
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="text-red-500 hover:bg-red-100 p-2 rounded-full"
-                      >
-
-                        <Trash2 size={20} />
-
-                      </button>
-
-                    </div>
-
-
-                    {/* QUANTITY */}
-
-                    <div className="flex items-center gap-4 mt-6">
-
-                      <button
-                        onClick={() => decreaseQty(item.id)}
-                        className="bg-gray-200 p-2 rounded-lg"
-                      >
-
-                        <Minus size={18} />
-
-                      </button>
-
-
-                      <span className="text-lg font-semibold">
-                        {item.qty}
-                      </span>
-
-
-                      <button
-                        onClick={() => increaseQty(item.id)}
-                        className="bg-emerald-600 text-white p-2 rounded-lg"
-                      >
-
-                        <Plus size={18} />
-
-                      </button>
-
-                    </div>
-
-
-                    {/* ITEM TOTAL */}
-
-                    <p className="text-xl font-bold text-emerald-700 mt-5">
-
-                      ₹{item.price * item.qty}
-
-                    </p>
-
-                  </div>
-
-                </div>
-
-              ))
-
-            }
-
+            {cart.map((item) => (
+              <CartItem
+                key={item.id}
+                item={item}
+                totalPrice={item.price * (productQuantity[item.id] || 1)}
+                removeItem={removeItem}
+                productQuantity={productQuantity}
+              />
+            ))}
           </div>
 
-
-          {/* SUMMARY */}
-
+          {/* ORDER SUMMARY */}
           <div className="bg-white rounded-3xl shadow-md p-6 h-fit">
+            <OrderSummary
 
-            <h2 className="text-2xl font-bold text-emerald-700 mb-6">
-              Order Summary
-            </h2>
-
-
-            <div className="flex items-center justify-between mb-4">
-
-              <p className="text-gray-600">
-                Total Items
-              </p>
-
-              <p className="font-semibold">
-                {cart.length}
-              </p>
-
-            </div>
-
-
-            <div className="flex items-center justify-between mb-6">
-
-              <p className="text-gray-600">
-                Total Price
-              </p>
-
-              <p className="text-2xl font-bold text-emerald-700">
-
-                ₹{totalPrice}
-
-              </p>
-
-            </div>
-
-
-            <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-2xl font-semibold transition">
-
-              Proceed to Checkout
-
-            </button>
+            cart={cart}
+form={form}
+totalPrice={totalPrice}
+quintalPrice={quintalPrice}
+setCheckout={setCheckout}
+            
+            
+            />
 
           </div>
-
         </div>
-
       )}
-
     </div>
+  );
+};
 
-  )
-
-}
-
-export default Cart
+export default Cart;

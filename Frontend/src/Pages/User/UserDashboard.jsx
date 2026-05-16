@@ -28,18 +28,18 @@ const UserDashboard = () => {
       {/* MAIN CONTENT */}
       <div className='lg:ml-[250px] pt-[80px]'>
 
-        {/* BANNER */}
+{/*       
         <div className='p-4 sm:p-6'>
           <MainBanner />
         </div>
  
 
-        {/* PRODUCTS */}
+   
 
-       <Products/>
+       <Products/> */}
 
 
-        <div className="lg:ml-[250px] pt-[80px] p-6">
+        <div className=" ">
 
   <div className="max-w-7xl mx-auto">
 

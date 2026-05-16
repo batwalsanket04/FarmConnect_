@@ -16,11 +16,11 @@ const FarmerForms = () => {
 
   const handleChange = (e) => {
 
-    const { name, value } = e.target
+    const { name, value,file,type } = e.target
 
     setForm({
       ...form,
-      [name]: value
+      [name]:type=="file"? value
     })
 
   }

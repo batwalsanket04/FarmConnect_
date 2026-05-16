@@ -1,5 +1,5 @@
 import React from 'react'
-import { Bell, User } from 'lucide-react'
+import { Bell, Search, User } from 'lucide-react'
 
 const FarmerNav = () => {
   return (
@@ -23,10 +23,13 @@ const FarmerNav = () => {
       <div className='flex items-center gap-4'>
 
          
-
+        <div className=' p-2 rounded-full'>
+          <Search />
+        </div>
         <div className='bg-emerald-100 p-2 rounded-full'>
           <User className='text-emerald-700' />
         </div>
+         
 
       </div>
 

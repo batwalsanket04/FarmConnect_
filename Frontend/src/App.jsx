@@ -17,6 +17,10 @@ import DashboardHome from './Pages/farmer/DashboardHome'
 import AddProducts from './Pages/farmer/AddProducts'
 import Order from './Pages/farmer/Order'
 import Cart from './Pages/User/Cart'
+import Products from './Pages/User/Products'
+import MainBanner from './Componants/MainBanner'
+import UserNav from './Pages/User/UserNav'
+import MyOrder from './Pages/User/MyOrder'
 
 const App = () => {
   return (
@@ -46,7 +50,19 @@ const App = () => {
         />
 
         <Route path='/user-dashboard' element={<UserDashboard/>}>
+        <Route index element={<>
+          <MainBanner/>
+          <Products/>
+          </>}/>
+          
+        
         <Route path='cart' element={<Cart/>}/>
+        <Route path='my-order' element={<>
+           <UserNav/>
+            <MyOrder/>
+          </>}/>
+
+        
 
         </Route>
        <Route path='/farmer-dashboard' element={<FarmerDashboard/>}>

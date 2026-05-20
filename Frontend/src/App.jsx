@@ -21,6 +21,7 @@ import Products from './Pages/User/Products'
 import MainBanner from './Componants/MainBanner'
 import UserNav from './Pages/User/UserNav'
 import MyOrder from './Pages/User/MyOrder'
+import Categories from './Componants/Categories'
 
 const App = () => {
   return (
@@ -52,6 +53,7 @@ const App = () => {
         <Route path='/user-dashboard' element={<UserDashboard/>}>
         <Route index element={<>
           <MainBanner/>
+          <Categories/>
           <Products/>
           </>}/>
           

@@ -15,6 +15,8 @@ const Cart = () => {
     setOrder,
     productQuantity,
     setProductQuantity,
+    ordersData, 
+    setOrdersData
   } = useAppContext();
   const navigate = useNavigate();
   const [checkout, setCheckout] = useState(false);
@@ -23,8 +25,8 @@ const Cart = () => {
     name: "",
     phone: "",
     address: "",
-    unit: "",
-    payment: "",
+    unit: "kg",
+    payment: "COD",
   });
 
   const [success, setSuccess] = useState(false);
@@ -32,7 +34,7 @@ const Cart = () => {
   const [unit, setUnit] = useState("kg");
 
   const quintalPrice = cart.reduce((total, item) => {
-    return total + item.price * (productQuantity[item.id] || 1) * 100;
+    return total + item.bulk_price * (productQuantity[item.id] || 1) * 100;
   }, 0);
 
   // REMOVE ITEM
@@ -42,7 +44,7 @@ const Cart = () => {
 
   // TOTAL PRICE
   const totalPrice = cart.reduce(
-    (total, item) => total + item.price * (productQuantity[item.id] ||1 ),
+    (total, item) => total + item.normal_price * (productQuantity[item.id] ||1 ),
     0,
   );
 
@@ -184,21 +186,23 @@ const Cart = () => {
             <div className="space-y-3">
               <label className="flex items-center gap-3 border rounded-xl p-4 cursor-pointer hover:border-emerald-500">
                 <input
-                  type="radio"
-                  name="payment"
-                  onChange={formHandle}
-                  value="COD"
-                />
+  type="radio"
+  name="payment"
+  value="COD"
+  checked={form.payment === "COD"}
+  onChange={formHandle}
+/>
                 Cash On Delivery
               </label>
 
               <label className="flex items-center gap-3 border rounded-xl p-4 cursor-pointer hover:border-emerald-500">
                 <input
-                  type="radio"
-                  name="payment"
-                  onChange={formHandle}
-                  value="UPI"
-                />
+  type="radio"
+  name="payment"
+  value="UPI"
+  checked={form.payment === "UPI"}
+  onChange={formHandle}
+/>
                 UPI Payment
               </label>
             </div>
@@ -310,7 +314,7 @@ const Cart = () => {
               <CartItem
                 key={item.id}
                 item={item}
-                totalPrice={item.price * (productQuantity[item.id] || 1)}
+                totalPrice={item.normal_price * (productQuantity[item.id] || 1)}
                 removeItem={removeItem}
                 productQuantity={productQuantity}
               />

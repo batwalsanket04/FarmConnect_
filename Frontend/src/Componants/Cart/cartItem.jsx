@@ -46,7 +46,7 @@ const CartItem = ({
         <div className="mt-5 flex items-center justify-between">
 
           <p className="text-xl font-bold text-emerald-700">
-            ₹{item.price * (productQuantity[item.id] || 1)}
+            ₹{item.normal_price * (productQuantity[item.id] || 1)}
           </p>
 
         </div>

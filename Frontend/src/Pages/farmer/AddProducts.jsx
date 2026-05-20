@@ -1,10 +1,65 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import {
   Upload,
   Plus
 } from "lucide-react";
+import { useAppContext } from "../../context/Context";
 
 const AddProduct = () => {
+
+  const{farmerProduct,setfarmerProduct}=useAppContext();
+
+    const [addfarmerProduct,setaddfarmerProduct]=useState({
+   product_image: null,
+    product_name: '',
+    category:'',
+    variety: '',
+    quantity: '',
+    normal_price: '',
+    bulk_price: '',
+    description: '',
+    call: false,
+    whatsapp: false
+
+  })
+
+    const [preview, setPreview] = useState(null);
+
+  
+
+
+
+ const handleForm = (e) => {
+  const { name, value, files, type, checked } = e.target;
+
+  if (type === "file") {
+
+  console.log(files[0]);
+
+  setaddfarmerProduct({
+    ...addfarmerProduct,
+    [name]: files[0],
+  });
+
+  setPreview(URL.createObjectURL(files[0]));
+}
+
+  else if (type === "checkbox") {
+    setaddfarmerProduct({
+      ...addfarmerProduct,
+      [name]: checked,
+    });
+  }
+
+  else {
+    setaddfarmerProduct({
+      ...addfarmerProduct,
+      [name]: value,
+    });
+  }
+  console.log(addfarmerProduct)
+};
+
   return (
 
     <div className="pt-[90px] p-4 bg-gradient-to-br from-emerald-50 to-green-100 min-h-screen">
@@ -26,39 +81,58 @@ const AddProduct = () => {
 
   {/* FORM CARD */}
 
-  <div className="bg-white mx-auto rounded-2xl shadow-lg p-5 max-w-2xl">
+  <form onSubmit={(e)=>{e.preventDefault();
+    const newProduct={
+      image:preview,
+      name:addfarmerProduct.product_name,
+      description:addfarmerProduct.description,
+      normal_price:addfarmerProduct.normal_price,
+      bulk_price:addfarmerProduct.bulk_price,
+      variety:addfarmerProduct.variety,
+      category:addfarmerProduct.category,
+      available:addfarmerProduct.quantity
+    }
+
+      setfarmerProduct([...farmerProduct,newProduct])
+      console.log(addfarmerProduct)
+  }} className="bg-white mx-auto rounded-2xl shadow-lg p-5 max-w-2xl">
 
     {/* IMAGE UPLOAD */}
 
     <div className="mb-6">
 
-      <label className="text-base font-semibold text-gray-700 mb-3 block">
-        Product Image
-      </label>
+      
 
       <div className="flex justify-center">
 
-        <label className="relative w-28 h-28 rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50 flex flex-col items-center justify-center cursor-pointer hover:bg-emerald-100 transition">
+        <label className="relative w-28 h-28 rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50 flex flex-col items-center justify-center cursor-pointer hover:bg-emerald-100 transition overflow-hidden">
 
-          <div className="absolute top-2 right-2 bg-emerald-600 text-white p-1 rounded-full">
+  {preview ? (
+    <img
+      src={preview}
+      alt="preview"
+      className="w-full h-full object-cover"  
+    />
+  ) : (
+    <>
+      <div className="absolute top-2 right-2 bg-emerald-600 text-white p-1 rounded-full">
+        <Plus size={14} />
+      </div>
+      <Upload className="text-emerald-600 mb-1" size={28} />
+      <p className="text-xs text-emerald-700 font-medium">Upload</p>
+    </>
+  )}
 
-            <Plus size={14} />
+  <input
+    id="product_image"
+    name="product_image"
+    type="file"
+    accept="image/*"
+    onChange={handleForm}
+    className="hidden"
+  />
 
-          </div>
-
-          <Upload className="text-emerald-600 mb-1" size={28} />
-
-          <p className="text-xs text-emerald-700 font-medium">
-            Upload
-          </p>
-
-          <input
-            type="file"
-            className="hidden"
-          />
-
-        </label>
-
+</label>
       </div>
 
     </div>
@@ -76,6 +150,9 @@ const AddProduct = () => {
 
         <input
           type="text"
+            onChange={handleForm}
+          name="product_name"
+          value={addfarmerProduct.product_name}
           placeholder="Product name"
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
         />
@@ -90,6 +167,9 @@ const AddProduct = () => {
         </label>
 
         <select
+        name="category"
+            onChange={handleForm}
+        value={addfarmerProduct.category}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
         >
 
@@ -113,7 +193,10 @@ const AddProduct = () => {
         </label>
 
         <input
+        name="variety"
+            onChange={handleForm}
           type="text"
+          value={addfarmerProduct.variety}
           placeholder="Organic / Hybrid"
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
         />
@@ -128,7 +211,10 @@ const AddProduct = () => {
         </label>
 
         <input
+        name="quantity"
           type="text"
+            onChange={handleForm}
+          value={addfarmerProduct.quantity}
           placeholder="50 KG"
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
         />
@@ -143,7 +229,10 @@ const AddProduct = () => {
         </label>
 
         <input
+        name="normal_price"
           type="number"
+            onChange={handleForm}
+          value={addfarmerProduct.normal_price}
           placeholder="₹ / KG"
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
         />
@@ -158,6 +247,9 @@ const AddProduct = () => {
         </label>
 
         <input
+        name="bulk_price"
+        value={addfarmerProduct.bulk_price}
+            onChange={handleForm}
           type="number"
           placeholder="₹ / KG"
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
@@ -177,6 +269,9 @@ const AddProduct = () => {
       </label>
 
       <textarea
+      name="description"
+      value={addfarmerProduct.description}
+            onChange={handleForm}
         rows="4"
         placeholder="Write product details..."
         className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-emerald-500 resize-none"
@@ -197,7 +292,7 @@ const AddProduct = () => {
 
         <label className="flex items-center gap-2 bg-emerald-50 px-3 py-2 rounded-lg text-sm cursor-pointer">
 
-          <input type="checkbox" />
+          <input name="call" type="checkbox" checked={addfarmerProduct.call} onChange={handleForm} />
 
           Call
 
@@ -205,7 +300,7 @@ const AddProduct = () => {
 
         <label className="flex items-center gap-2 bg-emerald-50 px-3 py-2 rounded-lg text-sm cursor-pointer">
 
-          <input type="checkbox" />
+          <input name="whatsapp"  type="checkbox" checked={addfarmerProduct.whatsapp} onChange={handleForm} />
 
           WhatsApp
 
@@ -220,7 +315,7 @@ const AddProduct = () => {
 
     <div className="mt-6">
 
-      <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg text-sm font-semibold shadow-md transition">
+      <button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg text-sm font-semibold shadow-md transition">
 
         Add Product
 
@@ -228,7 +323,7 @@ const AddProduct = () => {
 
     </div>
 
-  </div>
+  </form>
 
 </div>
   );

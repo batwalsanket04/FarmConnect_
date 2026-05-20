@@ -4,14 +4,15 @@ import {
   Phone,
   MapPin,
   Package,
-  CalendarDays
+  CalendarDays,
+  PhoneCall
 } from "lucide-react";
 
 import { useAppContext } from "../../context/Context";
 
 const MyOrder = () => {
 
-  const { order,productQuantity,cart } = useAppContext();
+  const { order,ordersData } = useAppContext();
 
   return (
 
@@ -73,24 +74,31 @@ const MyOrder = () => {
 
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
 
-                <span className="bg-white text-emerald-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+  <span className="bg-white text-emerald-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
 
-                  <BadgeCheck size={14} />
+    <BadgeCheck size={14} />
 
-                  {item.status}
+    {item.status}
 
-                </span>
+  </span>
 
-              </div>
+  <a
+    href={`tel:${item.phone}`}
+    className="bg-white text-emerald-700 p-2 rounded-full hover:bg-emerald-100 transition"
+  >
+    <PhoneCall size={16} />
+  </a>
+
+</div>
 
             </div>
 
             {/* PRODUCT */}
             <div className="p-4 space-y-3">
 
-              {item.cart.map((product) => (
+              {item.cart?.map((product) => (
 
                 <div
                   key={product.id}
@@ -100,7 +108,7 @@ const MyOrder = () => {
                   {/* IMAGE */}
                   <img
                     src={product.image}
-                    alt=""
+                    alt={product.name}
                     className="w-20 h-20 rounded-xl object-cover"
                   />
 
@@ -121,13 +129,13 @@ const MyOrder = () => {
 
                       </div>
 
-                      <h2 className="text-xl font-bold text-emerald-700">
-                        ₹{product.price * product.buyQty}
-                      </h2>
+                      {/* <h2 className="text-xl font-bold text-emerald-700">
+                        ₹{(product.price || 0) * (product.buyQty || 0)}
+                      </h2> */}
 
                     </div>
 
-                    <div className="flex gap-5 mt-3 text-sm">
+                    <div className="flex gap-5 mt-3 text-sm flex-wrap">
 
                       <div>
 
@@ -148,7 +156,7 @@ const MyOrder = () => {
                         </p>
 
                         <h3 className="font-semibold text-gray-800">
-                          {productQuantity[product.id]} {item.unit}
+                          {product.buyQty} {item.unit}
                         </h3>
 
                       </div>

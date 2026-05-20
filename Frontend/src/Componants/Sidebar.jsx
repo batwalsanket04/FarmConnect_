@@ -11,7 +11,8 @@ import {
   X,
   Bell,
   Search,
-  Home
+  Home,
+  ShoppingBag
 } from 'lucide-react'
 
 import { Link, Navigate, useNavigate } from 'react-router-dom'
@@ -181,6 +182,13 @@ const Sidebar = ({ type = "farmer" }) => {
                 <Bell size={20} />
 
                 Notifications
+
+              </button>
+              <button  onClick={()=>navigate('/user-dashboard/my-order')}  className='w-full flex items-center gap-3 hover:bg-emerald-600 px-4 py-3 rounded-xl transition-all duration-300'>
+
+                <ShoppingBag size={20} />
+
+                My Order
 
               </button>
 

@@ -4,7 +4,13 @@ import { useAppContext } from '../../context/Context';
 import { products } from '../../assets/assets';
 
 const Products = () => {
-  const { addToCart } = useAppContext();
+  const { addToCart,farmerProduct } = useAppContext();
+
+  
+  const data=JSON.parse(localStorage.getItem("farmerProducts"))
+  
+
+
  
 
   return (
@@ -17,7 +23,7 @@ const Products = () => {
 
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5'>
 
-          {products.map((product) => (   
+          {farmerProduct.map((product) => (   
             <div key={product.id} className='bg-white rounded-2xl shadow-md overflow-hidden'>
 
               <img
@@ -34,13 +40,39 @@ const Products = () => {
 
                 <p className='text-sm text-gray-500 mt-1'>{product.description}</p>
 
+                <div className='mt-4 space-y-1'>
+          
+          <p className='text-sm text-gray-600'>
+            Available:
+            <span className='font-bold text-emerald-700 ml-1'>
+              {product.available}/kg
+            </span>
+          </p>
+
+
+          <p className='text-sm text-gray-600'>
+            Normal Price:
+            <span className='font-bold text-emerald-700 ml-1'>
+              ₹{product.normal_price}/kg
+            </span>
+          </p>
+
+          <p className='text-sm text-gray-600'>
+            Bulk Price:
+            <span className='font-bold text-emerald-700 ml-1'>
+              ₹{product.bulk_price}/kg
+            </span>
+          </p>
+
+        </div>
+
                 <div className='flex items-center justify-between mt-4'>
-                  <p className='text-emerald-700 font-bold text-lg'>₹{(product.price || 0)}/kg</p>
+                  <p className='text-emerald-700 font-bold text-lg'>₹{(product.normal_price || 0)}/kg</p>
 
                   <button
                     onClick={() => {
                       addToCart(product);        
-                      console.log(product);      // ✅ logs only this card's data
+                      console.log(product);      
                     }}
                     className='bg-emerald-600 text-white px-4 py-2 rounded-lg'
                   >

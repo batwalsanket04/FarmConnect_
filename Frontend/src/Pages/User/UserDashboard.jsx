@@ -28,15 +28,7 @@ const UserDashboard = () => {
       {/* MAIN CONTENT */}
       <div className='lg:ml-[250px] pt-[80px]'>
 
-{/*       
-        <div className='p-4 sm:p-6'>
-          <MainBanner />
-        </div>
  
-
-   
-
-       <Products/> */}
 
 
         <div className=" ">

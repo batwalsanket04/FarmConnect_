@@ -1,8 +1,15 @@
 import { Heart } from 'lucide-react'
-import React from 'react'
+import React, { useContext } from 'react'
+import { useAppContext } from '../../context/Context'
 
 const MyProduct = () => {
+  
+  const {farmerProduct,setfarmerProduct}=useAppContext()
+
+
+
   return (
+    
     <div>
          <div className='p-4 sm:p-6'>
 
@@ -13,223 +20,79 @@ const MyProduct = () => {
 
           <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5'>
 
-            {/* CARD */}
+  {farmerProduct.map((item) => (
 
-            <div className='bg-white rounded-2xl shadow-md overflow-hidden'>
+    <div
+      key={item.id}
+      className='bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition'
+    >
 
-              <img
-                src='https://images.unsplash.com/photo-1542838132-92c53300491e'
-                alt='Tomato'
-                className='w-full h-40 object-cover'
-              />
+      <img
+        src={item.image}
+        alt={item.name}
+        className='w-full h-44 object-cover'
+      />
 
+      <div className='p-4'>
 
-              <div className='p-4'>
+        <div className='flex items-center justify-between mb-2'>
 
-                <div className='flex items-center justify-between'>
+          <h3 className='font-semibold text-lg text-gray-800'>
+            {item.name}
+          </h3>
 
-                  <h3 className='font-semibold text-lg'>
-                    Tomatoes
-                  </h3>
+          <Heart className='text-red-400 cursor-pointer' size={20} />
 
-                  <Heart className='text-red-400 cursor-pointer' />
+        </div>
 
-                </div>
+        <p className='text-sm text-gray-600'>
+            category:
+            <span className='font-bold text-emerald-700 ml-1'>
+              {item.category}
+            </span>
+          </p>
 
+        <p className='text-sm text-gray-500 line-clamp-2'>
+          {item.description}
+        </p>
 
-                <p className='text-sm text-gray-500 mt-1'>
-                  Fresh organic tomatoes directly from farmers.
-                </p>
+        <div className='mt-4 space-y-1'>
+          
+          <p className='text-sm text-gray-600'>
+            Available:
+            <span className='font-bold text-emerald-700 ml-1'>
+              {item.available}/kg
+            </span>
+          </p>
 
 
-                <div className='flex items-center justify-between mt-4'>
+          <p className='text-sm text-gray-600'>
+            Normal Price:
+            <span className='font-bold text-emerald-700 ml-1'>
+              ₹{item.normal_price}/kg
+            </span>
+          </p>
 
-                  <p className='text-emerald-700 font-bold text-lg'>
-                    ₹40/kg
-                  </p>
+          <p className='text-sm text-gray-600'>
+            Bulk Price:
+            <span className='font-bold text-emerald-700 ml-1'>
+              ₹{item.bulk_price}/kg
+            </span>
+          </p>
 
-                  <button className='bg-emerald-600 text-white px-4 py-2 rounded-lg'>
-                    Buy
-                  </button>
+        </div>
 
-                </div>
+        {/* <button className='w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl font-medium transition'>
+          Buy Now
+        </button> */}
 
-              </div>
+      </div>
 
-            </div>
+    </div>
 
+  ))}
 
-            {/* CARD */}
-
-            <div className='bg-white rounded-2xl shadow-md overflow-hidden'>
-
-              <img
-                src='https://images.unsplash.com/photo-1518977676601-b53f82aba655'
-                alt='Potato'
-                className='w-full h-40 object-cover'
-              />
-
-
-              <div className='p-4'>
-
-                <div className='flex items-center justify-between'>
-
-                  <h3 className='font-semibold text-lg'>
-                    Potatoes
-                  </h3>
-
-                  <Heart className='text-red-400 cursor-pointer' />
-
-                </div>
-
-
-                <p className='text-sm text-gray-500 mt-1'>
-                  Natural farm fresh potatoes.
-                </p>
-
-
-                <div className='flex items-center justify-between mt-4'>
-
-                  <p className='text-emerald-700 font-bold text-lg'>
-                    ₹30/kg
-                  </p>
-
-                  <button className='bg-emerald-600 text-white px-4 py-2 rounded-lg'>
-                    Buy
-                  </button>
-
-                </div>
-
-              </div>
-
-            </div>
-            <div className='bg-white rounded-2xl shadow-md overflow-hidden'>
-
-              <img
-                src='https://images.unsplash.com/photo-1518977676601-b53f82aba655'
-                alt='Potato'
-                className='w-full h-40 object-cover'
-              />
-
-
-              <div className='p-4'>
-
-                <div className='flex items-center justify-between'>
-
-                  <h3 className='font-semibold text-lg'>
-                    Potatoes
-                  </h3>
-
-                  <Heart className='text-red-400 cursor-pointer' />
-
-                </div>
-
-
-                <p className='text-sm text-gray-500 mt-1'>
-                  Natural farm fresh potatoes.
-                </p>
-
-
-                <div className='flex items-center justify-between mt-4'>
-
-                  <p className='text-emerald-700 font-bold text-lg'>
-                    ₹30/kg
-                  </p>
-
-                  <button className='bg-emerald-600 text-white px-4 py-2 rounded-lg'>
-                    Buy
-                  </button>
-
-                </div>
-
-              </div>
-
-            </div>
-            <div className='bg-white rounded-2xl shadow-md overflow-hidden'>
-
-              <img
-                src='https://images.unsplash.com/photo-1518977676601-b53f82aba655'
-                alt='Potato'
-                className='w-full h-40 object-cover'
-              />
-
-
-              <div className='p-4'>
-
-                <div className='flex items-center justify-between'>
-
-                  <h3 className='font-semibold text-lg'>
-                    Potatoes
-                  </h3>
-
-                  <Heart className='text-red-400 cursor-pointer' />
-
-                </div>
-
-
-                <p className='text-sm text-gray-500 mt-1'>
-                  Natural farm fresh potatoes.
-                </p>
-
-
-                <div className='flex items-center justify-between mt-4'>
-
-                  <p className='text-emerald-700 font-bold text-lg'>
-                    ₹30/kg
-                  </p>
-
-                  <button className='bg-emerald-600 text-white px-4 py-2 rounded-lg'>
-                    Buy
-                  </button>
-
-                </div>
-
-              </div>
-
-            </div><div className='bg-white rounded-2xl shadow-md overflow-hidden'>
-
-              <img
-                src='https://images.unsplash.com/photo-1518977676601-b53f82aba655'
-                alt='Potato'
-                className='w-full h-40 object-cover'
-              />
-
-
-              <div className='p-4'>
-
-                <div className='flex items-center justify-between'>
-
-                  <h3 className='font-semibold text-lg'>
-                    Potatoes
-                  </h3>
-
-                  <Heart className='text-red-400 cursor-pointer' />
-
-                </div>
-
-
-                <p className='text-sm text-gray-500 mt-1'>
-                  Natural farm fresh potatoes.
-                </p>
-
-
-                <div className='flex items-center justify-between mt-4'>
-
-                  <p className='text-emerald-700 font-bold text-lg'>
-                    ₹30/kg
-                  </p>
-
-                  <button className='bg-emerald-600 text-white px-4 py-2 rounded-lg'>
-                    Buy
-                  </button>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
+</div>
 
         </div>
 

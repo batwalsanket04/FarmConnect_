@@ -5,19 +5,41 @@ const AppContext = createContext();
 const AppContextProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
-
+// order from user and save it in local storage
   const [order, setOrder] = useState(() => {
     const savedOrders = localStorage.getItem("orders");
 
     return savedOrders ? JSON.parse(savedOrders) : [];
   });
 
+
+  // quantity of products in cart
+  const [productQuantity, setProductQuantity] = useState({});
+  // farmer forms
+  const [farmerForm,setfarmerForms]=useState([])
+
+  //Add product by Farmer
+  const [farmerProduct,setfarmerProduct]=useState(()=>{
+
+  const saveproducts=localStorage.getItem("farmerProducts");
+  
+   return saveproducts ? JSON.parse(saveproducts) :[];
+
+  })
+
+
+  
   useEffect(() => {
     localStorage.setItem("orders", JSON.stringify(order));
-  }, [order]);
+    localStorage.setItem("farmerProducts",JSON.stringify(farmerProduct))
+  }, [order,farmerProduct]);
 
-  const [productQuantity, setProductQuantity] = useState({});
-  const [farmerForm,setfarmerForms]=useState([])
+
+  // update order 
+  const [ordersData, setOrdersData] = useState(order);
+
+
+
    
 
   const addToCart = (product) => {
@@ -45,7 +67,12 @@ const AppContextProvider = ({ children }) => {
     productQuantity,
     setProductQuantity,
     farmerForm,
-    setfarmerForms
+    setfarmerForms,
+    farmerProduct,
+    setfarmerProduct,
+    ordersData,
+    setOrdersData
+   
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

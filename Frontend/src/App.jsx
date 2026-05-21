@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import {
   BrowserRouter,
@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom'
 
 import Navbar from './Componants/Navbar'
- 
+
 import UserForms from './Pages/auth/UserForms'
 import FarmerForms from './Pages/auth/FarmerForms'
 import UserDashboard from './Pages/User/UserDashboard'
@@ -22,8 +22,18 @@ import MainBanner from './Componants/MainBanner'
 import UserNav from './Pages/User/UserNav'
 import MyOrder from './Pages/User/MyOrder'
 import Categories from './Componants/Categories'
+import FallbackPage from './Componants/FallBackPage'
+import Pegination from './Componants/Pegination'
+import { useAppContext } from './context/Context'
 
 const App = () => {
+
+  // CATEGORY STATE
+  const [selectedCategory, setSelectedCategory] = useState("All")
+const [currentPage,setCurrentpage]=useState(0)
+const {farmerProduct}=useAppContext();
+
+
   return (
 
     <BrowserRouter>
@@ -45,36 +55,63 @@ const App = () => {
           element={
             <>
               <Navbar />
-              <FarmerForms/>
+              <FarmerForms />
             </>
           }
         />
 
-        <Route path='/user-dashboard' element={<UserDashboard/>}>
-        <Route index element={<>
-          <MainBanner/>
-          <Categories/>
-          <Products/>
-          </>}/>
+        {/* USER DASHBOARD */}
+        <Route path='/user-dashboard' element={<UserDashboard />}>
           
-        
-        <Route path='cart' element={<Cart/>}/>
-        <Route path='my-order' element={<>
-           <UserNav/>
-            <MyOrder/>
-          </>}/>
+          <Route
+            index
+            element={
+              <>
+                <MainBanner />
 
-        
+                <Categories
+                  setSelectedCategory={setSelectedCategory}
+                />
+
+                <Products
+                  selectedCategory={selectedCategory}
+                  currentPage={currentPage}
+                  farmerProduct={farmerProduct}
+                  
+                />
+                <Pegination 
+                currentPage={currentPage}
+                setCurrentpage={setCurrentpage}
+                farmerProduct={farmerProduct}
+                  />
+              </>
+            }
+          />
+
+          <Route path='cart' element={<Cart />} />
+
+          <Route
+            path='my-order'
+            element={
+              <>
+                <UserNav />
+                <MyOrder />
+              </>
+            }
+          />
 
         </Route>
-       <Route path='/farmer-dashboard' element={<FarmerDashboard/>}>
-  <Route index element={<DashboardHome/>}/>
-  <Route path='my-product' element={<MyProduct/>}/>
-  <Route path='add' element={<AddProducts/>}/>
-  <Route path='order' element={<Order/>}/>
 
-</Route>
+        {/* FARMER DASHBOARD */}
+        <Route path='/farmer-dashboard' element={<FarmerDashboard />}>
+          <Route index element={<DashboardHome />} />
+          <Route path='my-product' element={<MyProduct />} />
+          <Route path='add' element={<AddProducts />} />
+          <Route path='order' element={<Order />} />
+        </Route>
 
+        {/* FALLBACK ROUTE */}
+        <Route path='*' element={<FallbackPage />} />
 
       </Routes>
 

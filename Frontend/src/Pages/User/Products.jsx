@@ -1,15 +1,35 @@
 import { Heart } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import { useAppContext } from '../../context/Context';
 import { products } from '../../assets/assets';
 
-const Products = () => {
+const Products = ({selectedCategory,currentPage}) => {
   const { addToCart,farmerProduct } = useAppContext();
 
   
   const data=JSON.parse(localStorage.getItem("farmerProducts"))
+
+
+ 
+
+
+let Page_size=4;
+
+
+const start=currentPage * Page_size
+const end=start + Page_size
   
 
+
+  const filteredProducts =
+  selectedCategory === "All"
+    ? farmerProduct
+    : farmerProduct.filter(
+        (item) => item.category === selectedCategory
+      );
+
+
+  const peginatedProduct=filteredProducts.slice(start,end)
 
  
 
@@ -23,7 +43,7 @@ const Products = () => {
 
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5'>
 
-          {farmerProduct.map((product) => (   
+          {peginatedProduct.map((product) => (   
             <div key={product.id} className='bg-white rounded-2xl shadow-md overflow-hidden'>
 
               <img

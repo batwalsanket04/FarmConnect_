@@ -43,7 +43,10 @@ INSTALLED_APPS = [
     'farmconnect',
     'corsheaders',
     'rest_framework',
+     'rest_framework_simplejwt',
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -139,4 +142,5 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }

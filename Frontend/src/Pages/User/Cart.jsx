@@ -145,7 +145,7 @@ const Cart = () => {
               <div key={item.id} className="mt-4 flex items-center gap-3">
                 <input
                   type="number"
-                  min="1"
+                  min="5"
                   placeholder="Qty"
                   value={productQuantity[item.id] || ""}
                   onChange={(e) => quantityHandle(item.id, e.target.value)}

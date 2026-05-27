@@ -1,7 +1,11 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const FarmerForms = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [error, setError] = useState("");
+  const nav=useNavigate();
 
   const [form, setForm] = useState({
     farmer_name: "",
@@ -23,6 +27,68 @@ const FarmerForms = () => {
       setForm({ ...form, [name]: value });
     }
   };
+
+  const submitForm=async(e)=>{
+
+    e.preventDefault();
+
+      if(!isLogin)
+      {
+        const PassRegex= /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+        if (!PassRegex.test(form.password))
+        {
+          setError("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
+          return;
+        }
+      }
+
+      try{
+
+      const url=isLogin?"http://127.0.0.1:8000/api/farmer/login/":"http://127.0.0.1:8000/api/farmer/register/";
+
+      const res=await axios.post(url,form);
+
+      if(res.status===200 || res.status===201)
+      {
+        alert(res.data.message);
+
+        setForm
+        ({
+
+    farmer_name: "",
+    phone: "",
+    location: "",
+    email: "",
+    password: "",
+
+        });
+
+        if(!isLogin)
+        {
+          setIsLogin(true);
+        
+        }
+        else
+        {
+          localStorage.setItem("farmerToken",res.data.access);
+          nav("/farmer-dashboard");
+        }
+      }
+   
+    }
+    catch(error)
+    {
+      setError(error.Response?.data?.error || "Something went wrong");
+    }
+    finally
+    {
+      setLoading(false);
+    }
+
+
+
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 flex items-center justify-center px-4">
@@ -58,12 +124,12 @@ const FarmerForms = () => {
         </div>
 
         {/* FORM */}
-        <form className="space-y-2" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-2" onSubmit={submitForm} >
 
           {!isLogin && (
             <>
               {/* PHOTO UPLOAD */}
-              <div className="flex justify-center mb-2">
+              {/* <div className="flex justify-center mb-2">
                 <label htmlFor="photo" className="cursor-pointer">
                   {preview ? (
                     <img
@@ -85,7 +151,7 @@ const FarmerForms = () => {
                   onChange={handleChange}
                   className="hidden"
                 />
-              </div>
+              </div> */}
 
               <input
                 type="text"
@@ -134,6 +200,13 @@ const FarmerForms = () => {
             onChange={handleChange}
             className="w-full border border-emerald-300 p-2 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"
           />
+          {
+  error && (
+    <p className="text-red-500 text-sm text-center">
+      {error}
+    </p>
+  )
+}
 
           {/* BUTTON */}
           <button
@@ -171,7 +244,9 @@ const FarmerForms = () => {
         </p>
 
       </div>
+      
     </div>
+   
   );
 };
 

@@ -21,6 +21,8 @@ const Cart = () => {
   } = useAppContext();
   const navigate = useNavigate();
   const [checkout, setCheckout] = useState(false);
+ 
+  
 
   const [form, setForm] = useState({
     name: "",
@@ -92,7 +94,7 @@ const getItemTotal = (item) => {
     });
   };
 
-  //upi payment handle
+  //upi payment handle razorpay
 
   const handleUPIPayment = async (orderData) => {
     try {
@@ -130,7 +132,13 @@ const getItemTotal = (item) => {
     } catch (error) {
       console.log(error);
     }
+    
+     
   };
+
+   
+
+  
 
 
   // FORM HANDLE
@@ -172,10 +180,55 @@ const getItemTotal = (item) => {
     );
   }
 
+  const submitForm = async (e) => {
+    e.preventDefault();
+
+    const auth = JSON.parse(localStorage.getItem('auth')) || {};
+    const userId = auth.user?.id;
+
+    const orderData = {
+      user: userId,
+      id: Date.now(),
+      name: form.name,
+      phone: form.phone,
+      email: auth.user?.email || form.email,
+      address: form.address,
+      payment: form.payment,
+      status: 'pending',
+      orderdate: new Date().toLocaleDateString(),
+      cart: cart.map((item) => ({
+        id: item.id,
+        buyQty:
+          productQuantity[item.id] ??
+          ((productUnit[item.id] || 'kg') === 'kg' ? 5 : 1),
+        unit: productUnit[item.id] || 'kg',
+      })),
+      totalPrice,
+    };
+
+    if (form.payment === 'UPI') {
+      handleUPIPayment(orderData);
+      return;
+    }
+
+    try {
+      await axios.post('http://127.0.0.1:8000/api/order/create/', orderData);
+      alert(res.data.message || 'Order placed successfully!');
+    } catch (backendError) {
+      console.error('COD order creation failed:', backendError);
+      return;
+    }
+
+    setOrder((prev) => [...prev, orderData]);
+    setCart([]);
+    setProductQuantity({});
+    setSuccess(true);
+  };
+
   // CHECKOUT PAGE
   if (checkout) {
     return (
-      <form className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 p-4 sm:p-6">
+      <form onSubmit={submitForm} className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 p-4 sm:p-6">
         {/* BACK BUTTON */}
         <button
           onClick={() => setCheckout(false)}
@@ -375,43 +428,6 @@ const getItemTotal = (item) => {
           {/* PLACE ORDER */}
          <button
   type="submit"
-  onClick={(e) => {
-    e.preventDefault();
-
-    const orderData = {
-      id: Date.now(),
-      name: form.name,
-      phone: form.phone,
-      address: form.address,
-      payment: form.payment,
-      status: "pending",
-      orderdate: new Date().toLocaleDateString(),
-
-      cart: cart.map((item) => ({
-        ...item,
-        buyQty:
-          productQuantity[item.id] ??
-          ((productUnit[item.id] || "kg") === "kg" ? 5 : 1),
-
-        unit: productUnit[item.id] || "kg",
-      })),
-
-      totalPrice,
-    };
-
-    // UPI Payment
-    if (form.payment === "UPI") {
-      handleUPIPayment(orderData);
-      return;
-    }
-
-    // COD Order
-    setOrder((prev) => [...prev, orderData]);
-
-    setCart([]);
-    setProductQuantity({});
-    setSuccess(true);
-  }}
   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-semibold text-lg transition"
 >
   Place Order
@@ -469,6 +485,6 @@ const getItemTotal = (item) => {
       )}
     </div>
   );
-};
+}
 
 export default Cart;

@@ -174,34 +174,10 @@ def User_login(request):
                 'location':user.location
             }
         },status=200)
-
-
-    # Create User Order
-@api_view(['POST'])
-@csrf_exempt
-def Create_Order(request):
-
-    data = request.data
-
-    try:
-        user = User.objects.get(id=data.get('user'))
-    except User.DoesNotExist:
-        return Response({
-            "error": "User not found"
-        }, status=404)
-
-    try:
-        product = FarmerProduct.objects.get(id=data.get('product'))
-    except FarmerProduct.DoesNotExist:
-        return Response({
-            "error": "Product not found"
-        }, status=404)
-    
-# create upi Order
-
 client = razorpay.Client(
     auth=("rzp_test_Sw1AUUWTp2q8vV", "ZhEE4fWlv5kbLawEld10hdSj")
 )
+
 
 @api_view(['POST'])
 @csrf_exempt
@@ -222,35 +198,117 @@ def Create_UPI_Order(request):
         "amount": payment.get('amount')
     }, status=201)
 
-   
 
-    # total price calculate
-    quantity = int(data.get("quantity"))
-    unit = data.get("unit")
 
-    if unit == "quintal":
-      total_price = product.bulk_price * quantity
+@api_view(['POST'])
+@csrf_exempt
+def Create_Order(request):
+    """Create one or more UserOrder records from incoming order payload.
+
+    Expected payloads:
+    - Single item:
+      { "user": <id>, "product": <id>, "quantity": <n>, "unit": "kg|quintal", ... }
+
+    - Cart (multiple items):
+      { "user": <id>, "name":..., "phone":..., "address":..., "payment":..., "cart": [{id, buyQty, unit}, ...] }
+
+    If `user` is not provided, function will try to find a User by `phone` or `email`.
+    """
+    data = request.data
+
+    # resolve user
+    user = None
+    user_id = data.get('user')
+    if user_id:
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)
     else:
-      total_price = product.normal_price * quantity
+        phone = data.get('phone')
+        email = data.get('email')
+        if phone:
+            try:
+                user = User.objects.get(phone=phone)
+            except User.DoesNotExist:
+                user = None
+        elif email:
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                user = None
+
+    if not user:
+        return Response({"error": "User id or existing user phone/email required"}, status=400)
+
+    created_orders = []
+
+    # support cart (multiple items)
+    cart = data.get('cart')
+    if cart and isinstance(cart, list):
+        for item in cart:
+            product_id = item.get('id') or item.get('product')
+            try:
+                product = FarmerProduct.objects.get(id=product_id)
+            except FarmerProduct.DoesNotExist:
+                return Response({"error": f"Product not found: {product_id}"}, status=404)
+
+            quantity = int(item.get('buyQty') or item.get('quantity') or 1)
+            unit = item.get('unit') or 'kg'
+
+            if unit == 'quintal':
+                total_price = product.bulk_price * quantity
+            else:
+                total_price = product.normal_price * quantity
+
+            order = UserOrder.objects.create(
+                user=user,
+                product=product,
+                name=data.get('name') or user.name,
+                phone=data.get('phone') or user.phone,
+                address=data.get('address') or user.location,
+                quantity=quantity,
+                unit=unit,
+                payment=data.get('payment', 'COD'),
+                total_price=total_price
+            )
+            created_orders.append(order)
+
+        serializer = UserOrderSerializer(created_orders, many=True)
+        return Response({"message": "Orders Created Successfully", "orders": serializer.data}, status=201)
+
+    # fallback: single-item order
+    product_id = data.get('product')
+    if not product_id:
+        return Response({"error": "No product or cart provided"}, status=400)
+
+    try:
+        product = FarmerProduct.objects.get(id=product_id)
+    except FarmerProduct.DoesNotExist:
+        return Response({"error": "Product not found"}, status=404)
+
+    quantity = int(data.get('quantity') or 1)
+    unit = data.get('unit') or 'kg'
+
+    if unit == 'quintal':
+        total_price = product.bulk_price * quantity
+    else:
+        total_price = product.normal_price * quantity
 
     order = UserOrder.objects.create(
         user=user,
         product=product,
-        name=data.get('name'),
-        phone=data.get('phone'),
-        address=data.get('address'),
+        name=data.get('name') or user.name,
+        phone=data.get('phone') or user.phone,
+        address=data.get('address') or user.location,
         quantity=quantity,
-        unit=data.get('unit'),
-        payment=data.get('payment'),
+        unit=unit,
+        payment=data.get('payment', 'COD'),
         total_price=total_price
     )
 
     serializer = UserOrderSerializer(order)
-
-    return Response({
-        "message": "Order Created Successfully",
-        "order": serializer.data
-    }, status=201)
+    return Response({"message": "Order Created Successfully", "order": serializer.data}, status=201)
 
 
 
@@ -329,5 +387,16 @@ def get_allFarmers(request):
 
     farmer=Farmer.objects.all();
     serializer=FarmerRegistrationSerializer(farmer,many=True)
+    return Response(serializer.data,status=200)
+
+#logged in user Order
+@api_view(['GET'])
+@csrf_exempt
+
+def User_order_byId(request,user_id):
+
+    order=UserOrder.objects.filter(user_id=user_id).order_by('-created_at')
+    serializer=UserOrderSerializer(order,many=True)
+
     return Response(serializer.data,status=200)
 

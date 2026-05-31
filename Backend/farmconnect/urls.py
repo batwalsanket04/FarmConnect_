@@ -25,6 +25,8 @@ urlpatterns = [ path('',views.home, name='home'),
                #Create Order
                path('order/create/',views.Create_Order,),
                path('order/upi-order/',views.Create_UPI_Order,),
+               # fetch product of logged in user
+               path('user/products/<int:user_id>/',views.User_order_byId,),
               ] 
 
 

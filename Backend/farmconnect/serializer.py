@@ -19,6 +19,8 @@ class FarmerProductSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class UserOrderSerializer(serializers.ModelSerializer):
+    product = FarmerProductSerializer(read_only=True)
+
     class Meta:
         model = UserOrder
         fields = '__all__'

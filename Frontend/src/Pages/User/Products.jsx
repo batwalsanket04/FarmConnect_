@@ -1,13 +1,35 @@
 import { Heart } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAppContext } from '../../context/Context';
 import { products } from '../../assets/assets';
+import axios from 'axios';
 
 const Products = ({selectedCategory,currentPage}) => {
-  const { addToCart,farmerProduct } = useAppContext();
+  const { addToCart,farmerProduct,setfarmerProduct } = useAppContext();
+
+
+  useEffect(()=>{
+
+    const fetchProduct=async()=>{
+      try
+      {
+        const res=await axios.get(" http://127.0.0.1:8000/api/farmer/get-products/")
+       
+        setfarmerProduct(res.data);
+      }
+      catch(error)
+      {
+        console.log(error)
+      }
+
+    }
+
+    fetchProduct();
+
+  },[])
 
   
-  const data=JSON.parse(localStorage.getItem("farmerProducts"))
+   
 
 
  
@@ -46,11 +68,11 @@ const end=start + Page_size
           {peginatedProduct.map((product) => (   
             <div key={product.id} className='bg-white rounded-2xl shadow-md overflow-hidden'>
 
-              <img
-                src={product.image}
-                alt={product.name}
-                className='w-full h-40 object-cover'
-              />
+               <img
+  src={`http://127.0.0.1:8000${product.product_image}`}
+  alt={product.product_name}
+  className='w-full h-44 object-cover'
+/>
 
               <div className='p-4'>
                 <div className='flex items-center justify-between'>
@@ -65,7 +87,7 @@ const end=start + Page_size
           <p className='text-sm text-gray-600'>
             Available:
             <span className='font-bold text-emerald-700 ml-1'>
-              {product.available}/kg
+              {product.quantity}/kg
             </span>
           </p>
 

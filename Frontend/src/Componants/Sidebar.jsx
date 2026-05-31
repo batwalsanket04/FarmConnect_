@@ -25,6 +25,17 @@ const Sidebar = ({ type = "farmer" }) => {
 
   const navigate = useNavigate()
 
+
+  const logout = () => {
+
+  localStorage.removeItem("farmerToken");
+  localStorage.removeItem("userToken");
+  localStorage.removeItem("auth");
+
+  navigate("/");
+
+}
+
   return (
 
     <>
@@ -196,7 +207,7 @@ const Sidebar = ({ type = "farmer" }) => {
               
 
 
-              <button className='w-full flex items-center gap-3 hover:bg-emerald-600 px-4 py-3 rounded-xl transition-all duration-300'>
+              <button onClick={()=>navigate('/user-dashboard/farmers')} className='w-full flex items-center gap-3 hover:bg-emerald-600 px-4 py-3 rounded-xl transition-all duration-300'>
 
                 <Users size={20} />
 
@@ -212,7 +223,7 @@ const Sidebar = ({ type = "farmer" }) => {
 
           <div className='pt-6'>
 
-            <button className='w-full flex items-center gap-3 text-red-200 hover:bg-red-500 hover:text-white px-4 py-3 rounded-xl transition-all duration-300'>
+            <button onClick={logout} className='w-full flex items-center gap-3 text-red-200 hover:bg-red-500 hover:text-white px-4 py-3 rounded-xl transition-all duration-300'>
 
               <LogOut size={20} />
 

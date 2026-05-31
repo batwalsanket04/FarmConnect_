@@ -19,20 +19,15 @@ const AppContextProvider = ({ children }) => {
   const [farmerForm,setfarmerForms]=useState([])
 
   //Add product by Farmer
-  const [farmerProduct,setfarmerProduct]=useState(()=>{
-
-  const saveproducts=localStorage.getItem("farmerProducts");
-  
-   return saveproducts ? JSON.parse(saveproducts) :[];
-
-  })
+   const [farmerProduct, setfarmerProduct] = useState([]);
+    
 
 
   
   useEffect(() => {
     localStorage.setItem("orders", JSON.stringify(order));
-    localStorage.setItem("farmerProducts",JSON.stringify(farmerProduct))
-  }, [order,farmerProduct]);
+     
+  }, [order,]);
 
 
   // update order 

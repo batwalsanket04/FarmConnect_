@@ -1,10 +1,44 @@
 import { Heart } from 'lucide-react'
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { useAppContext } from '../../context/Context'
+import axios from 'axios'
 
 const MyProduct = () => {
   
   const {farmerProduct,setfarmerProduct}=useAppContext()
+
+
+
+  useEffect(()=>{
+    
+
+    const fetchProducts=async()=>{
+
+      try
+      {
+        const res=await axios.get(" http://127.0.0.1:8000/api/farmer/get-products/");
+
+        if(res.status===200)
+        {
+          setfarmerProduct(res.data);
+          console.log(farmerProduct);
+          console.log("Fetched products:", res.data);
+        }
+
+      }
+      catch(error)
+      {
+        console.error("Error fetching products:", error);
+
+      }
+
+
+
+    }
+    fetchProducts();
+
+  },[])
+  const product_length=farmerProduct.length;
 
 
 
@@ -28,10 +62,10 @@ const MyProduct = () => {
     >
 
       <img
-        src={item.image}
-        alt={item.name}
-        className='w-full h-44 object-cover'
-      />
+  src={`http://127.0.0.1:8000${item.product_image}`}
+  alt={item.product_name}
+  className='w-full h-44 object-cover'
+/>
 
       <div className='p-4'>
 
@@ -61,7 +95,7 @@ const MyProduct = () => {
           <p className='text-sm text-gray-600'>
             Available:
             <span className='font-bold text-emerald-700 ml-1'>
-              {item.available}/kg
+              {item.quantity}/kg
             </span>
           </p>
 

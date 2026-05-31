@@ -1,7 +1,47 @@
+import axios from 'axios'
 import { IndianRupee, Package, ShoppingCart, TrendingUp } from 'lucide-react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+ 
 
 const DashboardHome = () => {
+
+const [product,setProduct]=useState([])
+const nav=useNavigate();
+
+
+useEffect(()=>{
+
+  const fetchData=async()=>{
+
+  
+try{
+  const auth= JSON.parse(localStorage.getItem("auth"));
+  const id=auth?.farmer?.id;
+
+  const res=await axios.get(`http://127.0.0.1:8000/api/farmer/products/${id}/`)
+
+  setProduct(res.data);
+
+
+  }
+  catch(error)
+{
+  console.log(error)
+  
+}
+}
+
+fetchData();
+
+
+},[])
+
+
+
+
+
+ 
   return (
     <div>
         <div className=' pt-[80px] p-6'>
@@ -38,7 +78,7 @@ const DashboardHome = () => {
                 </h2>
 
                 <p className='text-3xl font-bold text-emerald-700 mt-2'>
-                  12
+                  {product.length}
                 </p>
 
               </div>
@@ -151,7 +191,7 @@ const DashboardHome = () => {
                 Recent Products
               </h2>
 
-              <button className='bg-emerald-600 text-white px-4 py-2 rounded-lg'>
+              <button onClick={()=>nav('/farmer-dashboard/add')} className='bg-emerald-600 text-white px-4 py-2 rounded-lg cursor-pointer '>
                 Add Product
               </button>
 

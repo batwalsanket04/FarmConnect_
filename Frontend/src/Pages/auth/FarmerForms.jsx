@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const FarmerForms = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const nav=useNavigate();
 
   const [form, setForm] = useState({
@@ -44,6 +45,7 @@ const FarmerForms = () => {
       }
 
       try{
+        setLoading(true);
 
       const url=isLogin?"http://127.0.0.1:8000/api/farmer/login/":"http://127.0.0.1:8000/api/farmer/register/";
 
@@ -71,7 +73,19 @@ const FarmerForms = () => {
         }
         else
         {
-          localStorage.setItem("farmerToken",res.data.access);
+          // Store auth data in a consistent format
+          const authData = {
+            token: res.data.access_token,
+            role: res.data.role, // Use the role from API response
+            farmer: res.data.farmer
+          };
+          
+          localStorage.setItem("auth", JSON.stringify(authData));
+          localStorage.setItem("farmer_id", res.data.farmer.id);
+          
+          // Optional: Also store token separately for backward compatibility
+          localStorage.setItem("farmerToken", res.data.access_token);
+          
           nav("/farmer-dashboard");
         }
       }
@@ -79,7 +93,7 @@ const FarmerForms = () => {
     }
     catch(error)
     {
-      setError(error.Response?.data?.error || "Something went wrong");
+      setError(error.response?.data?.error || "Something went wrong");
     }
     finally
     {
@@ -211,9 +225,10 @@ const FarmerForms = () => {
           {/* BUTTON */}
           <button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 transition-all duration-300 text-white py-2 rounded-xl font-semibold shadow-lg"
+            disabled={loading}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 transition-all duration-300 text-white py-2 rounded-xl font-semibold shadow-lg"
           >
-            {isLogin ? "Login" : "Create Account"}
+            {loading ? "Processing..." : (isLogin ? "Login" : "Create Account")}
           </button>
 
         </form>

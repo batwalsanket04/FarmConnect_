@@ -25,6 +25,10 @@ import Categories from './Componants/Categories'
 import FallbackPage from './Componants/FallBackPage'
 import Pegination from './Componants/Pegination'
 import { useAppContext } from './context/Context'
+import ProtectedRoutes from './Pages/auth/ProtectedRoutes'
+import Farmers from './Componants/Farmers'
+import FarmerProducts from './Componants/farmerProducts'
+ 
 
 const App = () => {
 
@@ -61,7 +65,7 @@ const {farmerProduct}=useAppContext();
         />
 
         {/* USER DASHBOARD */}
-        <Route path='/user-dashboard' element={<UserDashboard />}>
+        <Route path='/user-dashboard' element={<ProtectedRoutes allowedRole="user"><UserDashboard /></ProtectedRoutes>}>
           
           <Route
             index
@@ -99,15 +103,18 @@ const {farmerProduct}=useAppContext();
               </>
             }
           />
+         < Route path='farmers' element={<Farmers/>} />
+         <Route path='farmer/:id' element={<FarmerProducts/>} />
 
         </Route>
 
         {/* FARMER DASHBOARD */}
-        <Route path='/farmer-dashboard' element={<FarmerDashboard />}>
+        <Route path='/farmer-dashboard' element={<ProtectedRoutes allowedRole="farmer"><FarmerDashboard /></ProtectedRoutes>}>
           <Route index element={<DashboardHome />} />
           <Route path='my-product' element={<MyProduct />} />
           <Route path='add' element={<AddProducts />} />
           <Route path='order' element={<Order />} />
+          
         </Route>
 
         {/* FALLBACK ROUTE */}

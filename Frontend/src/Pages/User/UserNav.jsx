@@ -11,6 +11,12 @@ import {
 import logo from '../../assets/OIP.webp'
 
 const UserNav = () => {
+   
+  const storedUser = localStorage.getItem("userData");
+
+  const user = storedUser
+    ? JSON.parse(storedUser)
+    : null;
 
   return (
 
@@ -35,6 +41,11 @@ const UserNav = () => {
         <div className=' p-2 rounded-full'>
                   <Search />
                 </div>
+          
+          <h2 className="text-lg font-semibold text-emerald-700">
+      {user?.name || "Guest"}
+    </h2>
+
 
         <div className='bg-emerald-100 p-2 rounded-full'>
           <User className='text-emerald-700' />

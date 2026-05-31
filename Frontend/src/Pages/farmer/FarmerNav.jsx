@@ -2,6 +2,12 @@ import React from 'react'
 import { Bell, Search, User } from 'lucide-react'
 
 const FarmerNav = () => {
+
+  const storedFarmer = localStorage.getItem("auth");
+  console.log("Stored farmer data:", storedFarmer);
+
+   const name= JSON.parse(storedFarmer)?.farmer?.farmer_name || "Farmer";
+  
   return (
 
     <div
@@ -26,7 +32,13 @@ const FarmerNav = () => {
         <div className=' p-2 rounded-full'>
           <Search />
         </div>
+
+        <h2 className="text-lg font-semibold text-emerald-700">
+      Welcome, {name}
+        
+    </h2>
         <div className='bg-emerald-100 p-2 rounded-full'>
+
           <User className='text-emerald-700' />
         </div>
          

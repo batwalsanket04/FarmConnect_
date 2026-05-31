@@ -107,8 +107,8 @@ const MyOrder = () => {
 
                   {/* IMAGE */}
                   <img
-                    src={product.image}
-                    alt={product.name}
+                    src={`http://127.0.0.1:8000${product.product_image}`}
+                    alt={product.product_name}
                     className="w-20 h-20 rounded-xl object-cover"
                   />
 
@@ -144,7 +144,7 @@ const MyOrder = () => {
                         </p>
 
                         <h3 className="font-semibold text-gray-800">
-                          ₹{product.price}/kg
+                          ₹{product.bulk_price}/kg
                         </h3>
 
                       </div>
@@ -156,7 +156,7 @@ const MyOrder = () => {
                         </p>
 
                         <h3 className="font-semibold text-gray-800">
-                          {product.buyQty} {item.unit}
+                          {product.buyQty} {product.unit}
                         </h3>
 
                       </div>

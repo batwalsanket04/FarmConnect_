@@ -1,8 +1,19 @@
+from django.core.validators import RegexValidator
 from django.db import models
 
 
  
 class Farmer(models.Model):
+
+    phone_regex = RegexValidator(
+        regex=r'^[6-9]\d{9}$',
+        message="Enter valid Indian phone number"
+    )
+
+    password_regex = RegexValidator(
+        regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$',
+        message="Password must contain uppercase, lowercase, number and special character"
+    )
 
     farmer_name = models.CharField(
         max_length=100
@@ -10,7 +21,8 @@ class Farmer(models.Model):
 
     phone = models.CharField(
         max_length=10,
-        unique=True
+        unique=True,
+        validators=[phone_regex]
     )
 
     location = models.CharField(
@@ -22,7 +34,8 @@ class Farmer(models.Model):
     )
 
     password = models.CharField(
-        max_length=255
+        max_length=255,
+        validators=[password_regex]
     )
 
     created_at = models.DateTimeField(

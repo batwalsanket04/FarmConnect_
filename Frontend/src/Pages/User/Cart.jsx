@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import CartItem from "../../Componants/Cart/cartItem";
 import OrderSummary from "../../Componants/Cart/orderSummery";
 import SuccessPage from "../../Componants/Cart/successPage";
+import axios from "axios";
 
 const Cart = () => {
   const {
@@ -29,38 +30,137 @@ const Cart = () => {
     payment: "COD",
   });
 
+  const [productUnit, setProductUnit] = useState({});
+
+  const handleUnitChange = (id, unit) => {
+  setProductUnit({
+    ...productUnit,
+    [id]: unit,
+  });
+
+  // when unit changes for an item, ensure its quantity is set to the unit default
+  const defaultQty = unit === "kg" ? 5 : 1;
+  setProductQuantity({
+    ...(productQuantity || {}),
+    [id]: defaultQty,
+  });
+};
+
+// helper to get quantity for an item (respecting unit defaults)
+const getItemQuantity = (item) => {
+  const pq = productQuantity || {};
+  const pu = productUnit || {};
+  const unit = pu[item.id] || "kg";
+
+  return (
+    pq[item.id] ?? (unit === "kg" ? 5 : 1)
+  );
+};
+
+// helper to compute an item's total price
+const getItemTotal = (item) => {
+  const qty = getItemQuantity(item);
+  const unit = (productUnit && productUnit[item.id]) || "kg";
+
+  if (unit === "quintal") {
+    return item.bulk_price * qty * 100;
+  }
+
+  return item.normal_price * qty;
+};
+
   const [success, setSuccess] = useState(false);
-
-  const [unit, setUnit] = useState("kg");
-
-  const quintalPrice = cart.reduce((total, item) => {
-    return total + item.bulk_price * (productQuantity[item.id] || 1) * 100;
-  }, 0);
+ 
 
   // REMOVE ITEM
   const removeItem = (id) => {
     setCart(cart.filter((item) => item.id !== id));
   };
 
-  // TOTAL PRICE
-  const totalPrice = cart.reduce(
-    (total, item) => total + item.normal_price * (productQuantity[item.id] ||1 ),
-    0,
-  );
-
+  const totalPrice = cart.reduce((total, item) => {
+    return total + getItemTotal(item);
+  }, 0);
+   
   const quantityHandle = (id, value) => {
+    const num = Number(value);
+    const unit = (productUnit && productUnit[id]) || "kg";
+    const min = unit === "kg" ? 5 : 1;
+
     setProductQuantity({
-      ...productQuantity,
-      [id]: Number(value),
+      ...(productQuantity || {}),
+      [id]: isNaN(num) ? min : Math.max(min, num),
     });
   };
 
-  // FORM HANDLE
+  //upi payment handle
 
-  const formHandle = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleUPIPayment = async (orderData) => {
+    try {
+      const res = await axios.post(
+        "http://127.0.0.1:8000/api/order/upi-order/",
+        {
+          amount: totalPrice,
+        }
+      );
+
+      const payment = res.data.payment;
+
+      const options = {
+        key: "rzp_test_Sw1AUUWTp2q8vV",
+        amount: payment.amount,
+        currency: "INR",
+        order_id: payment.id,
+        name: "Farm Connect",
+        handler: async function (response) {
+          console.log("Razorpay response:", response);
+          setCart([]);
+          setProductQuantity({});
+          setOrder((prev) => [...prev, orderData]);
+          setSuccess(true);
+        },
+      };
+
+      if (!window.Razorpay) {
+        console.error("Razorpay checkout script is not loaded.");
+        return;
+      }
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
+
+  // FORM HANDLE
+
+ const formHandle = (e) => {
+  const { name, value } = e.target;
+
+  if (name === "unit") {
+    setForm({
+      ...form,
+      unit: value,
+    });
+
+    // Set default quantity
+    const defaultQty = value === "kg" ? 5 : 1;
+
+    const updatedQty = {};
+
+    cart.forEach((item) => {
+      updatedQty[item.id] = defaultQty;
+    });
+
+    setProductQuantity(updatedQty);
+  } else {
+    setForm({
+      ...form,
+      [name]: value,
+    });
+  }
+};
   // SUCCESS PAGE
   if (success) {
     return (
@@ -141,40 +241,47 @@ const Cart = () => {
           {/* QUANTITY + UNIT */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
             {/* QUANTITY */}
-            {cart.map((item) => (
-              <div key={item.id} className="mt-4 flex items-center gap-3">
-                <input
-                  type="number"
-                  min="5"
-                  placeholder="Qty"
-                  value={productQuantity[item.id] || ""}
-                  onChange={(e) => quantityHandle(item.id, e.target.value)}
-                  className="border border-gray-300 rounded-xl px-3 py-2 w-24 outline-none focus:border-emerald-500"
-                />
+           {cart.map((item) => (
+  <div key={item.id} className="flex items-center gap-3">
 
-                <span className="font-semibold text-gray-600">
-                  {item.name} ({form.unit || "kg"})
-                </span>
-              </div>
-            ))}
+    <input
+  type="number"
+  min={
+    (productUnit[item.id] || "kg") === "kg"
+      ? 5
+      : 1
+  }
+  value={
+    productQuantity[item.id] ??
+    (
+      (productUnit[item.id] || "kg") === "kg"
+        ? 5
+        : 1
+    )
+  }
+  onChange={(e) =>
+    quantityHandle(item.id, e.target.value)
+  }
+  className="border border-gray-300 rounded-xl px-3 py-2 w-24 outline-none focus:border-emerald-500"
+/>
+
+    <select
+  value={productUnit[item.id] || "kg"}
+  onChange={(e) =>
+    handleUnitChange(item.id, e.target.value)
+  }
+  className="border border-gray-300 rounded-xl px-3 py-2"
+>
+  <option value="kg">KG</option>
+  <option value="quintal">Quintal</option>
+</select>
+
+    <span>{item.product_name}</span>
+
+  </div>
+))}
             {/* UNIT */}
-            <div>
-              <label className="block mb-2 font-semibold text-gray-700">
-                Unit
-              </label>
-
-              <select
-               
-                name="unit"
-                value={form.unit}
-                onChange={formHandle}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-emerald-500"
-              >
-                <option value="kg">Kilogram (KG)</option>
-
-                <option value="quintal">Quintal</option>
-              </select>
-            </div>
+             
           </div>
 
           {/* PAYMENT */}
@@ -215,23 +322,41 @@ const Cart = () => {
 
              <p className="font-semibold">
   {
-    Object.values(productQuantity).reduce(
-      (total, qty) => total + qty,
-      0
+    cart.reduce((total, item) => {
+  const unit = productUnit[item.id] || "kg";
+
+  return (
+    total +
+    (
+      productQuantity[item.id] ??
+      (unit === "kg" ? 5 : 1)
     )
+  );
+}, 0)
   }
 </p>
             </div>
 
-            <div className="flex items-center justify-between">
-              <p className="text-gray-600 font-medium">Buying Unit</p>
+            <div>
+  <p className="text-gray-600 font-medium mb-2">
+    Order Units
+  </p>
 
-              {form.unit === "kg" ? (
-                <p className="font-semibold uppercase">{form.unit}</p>
-              ) : (
-                <p className="font-semibold uppercase">{form.unit}</p>
-              )}
-            </div>
+  {cart.map((item) => (
+    <div
+      key={item.id}
+      className="flex justify-between text-sm"
+    >
+      <span>{item.product_name}</span>
+
+      <span>
+        {getItemQuantity(item)}
+        {" "}
+        {productUnit[item.id] || "kg"}
+      </span>
+    </div>
+  ))}
+</div>
 
             <div className="flex items-center justify-between">
               <p className="text-gray-600 font-medium">Delivery</p>
@@ -243,45 +368,54 @@ const Cart = () => {
 
             <div className="flex items-center justify-between">
               <p className="text-xl font-bold text-gray-800">Total Amount</p>
-
-              {form.unit == "quintal" ? (
-                <h2 className="text-3xl font-bold text-emerald-700">
-                  ₹{quintalPrice}
-                </h2>
-              ) : (
-                <h2 className="text-3xl font-bold text-emerald-700">
-                  ₹{totalPrice}
-                </h2>
-              )}
+              <h2 className="text-3xl font-bold text-emerald-700">₹{totalPrice}</h2>
             </div>
           </div>
 
           {/* PLACE ORDER */}
-          <button
-          type="submit"
-            onClick={(e) => {
-              e.preventDefault();
+         <button
+  type="submit"
+  onClick={(e) => {
+    e.preventDefault();
 
-              const orderData = {
-                id: Date.now(),
-                ...form,
-                cart: cart.map((item) => ({
-                  ...item,
-                  buyQty: productQuantity[item.id] || 0,
-                })),
-                totalPrice,
-                status: "pending",
-                orderdate: new Date().toLocaleDateString(),
-              };
-              console.log(orderData);
-             setOrder((prev) => [...prev, orderData]);
-             setSuccess(true)
-               
-            }}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-semibold text-lg transition"
-          >
-            Place Order
-          </button>
+    const orderData = {
+      id: Date.now(),
+      name: form.name,
+      phone: form.phone,
+      address: form.address,
+      payment: form.payment,
+      status: "pending",
+      orderdate: new Date().toLocaleDateString(),
+
+      cart: cart.map((item) => ({
+        ...item,
+        buyQty:
+          productQuantity[item.id] ??
+          ((productUnit[item.id] || "kg") === "kg" ? 5 : 1),
+
+        unit: productUnit[item.id] || "kg",
+      })),
+
+      totalPrice,
+    };
+
+    // UPI Payment
+    if (form.payment === "UPI") {
+      handleUPIPayment(orderData);
+      return;
+    }
+
+    // COD Order
+    setOrder((prev) => [...prev, orderData]);
+
+    setCart([]);
+    setProductQuantity({});
+    setSuccess(true);
+  }}
+  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-semibold text-lg transition"
+>
+  Place Order
+</button>
         </div>
       </form>
     );
@@ -314,7 +448,7 @@ const Cart = () => {
               <CartItem
                 key={item.id}
                 item={item}
-                totalPrice={item.normal_price * (productQuantity[item.id] || 1)}
+                totalPrice={getItemTotal(item)}
                 removeItem={removeItem}
                 productQuantity={productQuantity}
               />
@@ -324,14 +458,10 @@ const Cart = () => {
           {/* ORDER SUMMARY */}
           <div className="bg-white rounded-3xl shadow-md p-6 h-fit">
             <OrderSummary
-
-            cart={cart}
-form={form}
-totalPrice={totalPrice}
-quintalPrice={quintalPrice}
-setCheckout={setCheckout}
-            
-            
+              cart={cart}
+              form={form}
+              totalPrice={totalPrice}
+              setCheckout={setCheckout}
             />
 
           </div>

@@ -1,9 +1,14 @@
  
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const UserForms = () => {
 
   const [isLogin, setIsLogin] = useState(true)
+  const [error, setError] = useState("")
+  const [loading,setLoading]=useState(false)
+  const nav=useNavigate();
 
   const [form, setForm] = useState({
     role: 'customer',
@@ -23,6 +28,83 @@ const UserForms = () => {
       ...form,
       [name]: value
     })
+  }
+
+  const submitForm=async(e)=>{
+
+    e.preventDefault();
+    setLoading(true)
+    setError("");
+
+
+    if(!isLogin)
+    {
+      const PassRegex= /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+      if (!PassRegex.test(form.password))
+      {
+        setError("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
+        return;
+      }
+    }
+
+     try{
+      const url=isLogin?
+        "http://127.0.0.1:8000/api/user/login/"
+      : "http://127.0.0.1:8000/api/user/register/";
+
+
+      const res=await axios.post(url,form);
+
+      if(res.status===200 || res.status===201)
+      {
+        alert(res.data.message);
+
+        setForm({
+          role: 'customer',
+          name: '',
+          business: '',
+          owner: '',
+          phone: '',
+          location: '',
+          email: '',
+          password: ''
+        });
+
+        if(!isLogin)
+        {
+          setIsLogin(true);
+        }
+       // Login Success
+else
+{
+  // Store auth data in a single place for consistency
+  const authData = {
+    token: res.data.access_token,
+    role: res.data.role, // Use the role from API response
+    user: res.data.user
+  };
+  
+  localStorage.setItem("auth", JSON.stringify(authData));
+  
+  // Optional: Also store individual items for backward compatibility
+  localStorage.setItem("token", res.data.access_token);
+  localStorage.setItem("role", res.data.role);
+
+  nav("/user-dashboard");
+}
+      }
+
+     }
+     catch(error)
+     {
+      setError(error.response?.data?.error );
+
+     } finally{
+      setLoading(false)
+     }
+
+
   }
 
   return (
@@ -72,7 +154,7 @@ const UserForms = () => {
 
 
         {/* FORM */}
-        <form className='space-y-2'>
+        <form className='space-y-2' onSubmit={submitForm}>
 
           {!isLogin && (
             <>
@@ -170,13 +252,30 @@ const UserForms = () => {
             className='w-full border border-emerald-300 p-2 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500'
           />
 
+          {
+  error && (
+    <p className="text-red-500 text-sm text-center">
+      {error}
+    </p>
+  )
+}
+
 
           {/* BUTTON */}
           <button
-            className='w-full bg-emerald-600 hover:bg-emerald-700 transition-all duration-300 text-white py-2 rounded-xl font-semibold shadow-lg'
-          >
-            {isLogin ? 'Login' : 'Create Account'}
-          </button>
+  type="submit"
+  disabled={loading}
+  className="w-full bg-emerald-600 text-white py-2 rounded-xl font-semibold flex items-center justify-center gap-2"
+>
+  {loading ? (
+    <>
+      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      Processing...
+    </>
+  ) : (
+    isLogin ? "Login" : "Create Account"
+  )}
+</button>
 
         </form>
 

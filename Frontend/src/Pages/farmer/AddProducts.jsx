@@ -4,6 +4,7 @@ import {
   Plus
 } from "lucide-react";
 import { useAppContext } from "../../context/Context";
+import axios from "axios";
 
 const AddProduct = () => {
 
@@ -60,6 +61,72 @@ const AddProduct = () => {
   console.log(addfarmerProduct)
 };
 
+const url= "http://127.0.0.1:8000/api/farmer/add-product/"
+
+const submitForm = async (e) => {
+
+  e.preventDefault();
+
+ 
+
+  try {
+
+    const formData = new FormData();
+
+    Object.entries(addfarmerProduct).forEach(([key, value]) => {
+
+  if (typeof value === "boolean") {
+    formData.append(key, value ? "True" : "False");
+  }
+
+  else {
+    formData.append(key, value);
+  }
+
+});
+
+
+      
+    // send farmer id
+    const farmerId =
+      localStorage.getItem("farmer_id") ||
+      JSON.parse(localStorage.getItem("auth"))?.farmer?.id;
+
+    formData.append("farmer", farmerId);
+    console.log(farmerId); // showing id correctly in console
+
+    const res = await axios.post(url, formData);
+    if (res.data.product) {
+      setfarmerProduct([...farmerProduct, res.data.product]);
+    }
+    console.log(res.data);
+    window.alert(res.data.message);
+    setaddfarmerProduct({
+
+       product_image: null,
+    product_name: '',
+    category:'',
+    variety: '',
+    quantity: '',
+    normal_price: '',
+    bulk_price: '',
+    description: '',
+    call: false,
+    whatsapp: false
+
+    })
+
+  } catch (error) {
+
+  console.log(error.response?.data);
+
+  window.alert(
+    error.response?.data?.error || "Something went wrong"
+  );
+
+}
+};
+
   return (
 
     <div className="pt-[90px] p-4 bg-gradient-to-br from-emerald-50 to-green-100 min-h-screen">
@@ -81,22 +148,7 @@ const AddProduct = () => {
 
   {/* FORM CARD */}
 
-  <form onSubmit={(e)=>{e.preventDefault();
-    const newProduct={
-      image:preview,
-      name:addfarmerProduct.product_name,
-      description:addfarmerProduct.description,
-      normal_price:addfarmerProduct.normal_price,
-      bulk_price:addfarmerProduct.bulk_price,
-      variety:addfarmerProduct.variety,
-      category:addfarmerProduct.category,
-      available:addfarmerProduct.quantity
-    }
-
-      setfarmerProduct([...farmerProduct,newProduct])
-      console.log(addfarmerProduct)
-  }} className="bg-white mx-auto rounded-2xl shadow-lg p-5 max-w-2xl">
-
+  <form onSubmit={submitForm} className="bg-white mx-auto rounded-2xl shadow-lg p-5 max-w-2xl">
     {/* IMAGE UPLOAD */}
 
     <div className="mb-6">
@@ -172,8 +224,8 @@ const AddProduct = () => {
         value={addfarmerProduct.category}
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
         >
-
-          <option>Vegetables</option>
+          <option value="">Select Category</option>
+          <option >Vegetables</option>
 
           <option>Fruits</option>
 
@@ -212,10 +264,10 @@ const AddProduct = () => {
 
         <input
         name="quantity"
-          type="text"
+          type="number"
             onChange={handleForm}
           value={addfarmerProduct.quantity}
-          placeholder="50 KG"
+          placeholder="50 Kg"
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
         />
 

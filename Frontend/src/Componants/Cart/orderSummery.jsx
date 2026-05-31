@@ -6,7 +6,6 @@ const OrderSummary = ({
   cart,
   form,
   totalPrice,
-  quintalPrice,
   setCheckout
 }) => {
   return (
@@ -34,9 +33,7 @@ const OrderSummary = ({
           Total Price
         </p>
 
-        <p className="text-2xl font-bold text-emerald-700">
-          ₹{form.unit === "quintal" ? quintalPrice : totalPrice}
-        </p>
+        <p className="text-2xl font-bold text-emerald-700">₹{totalPrice}</p>
 
       </div>
 

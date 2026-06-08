@@ -4,6 +4,7 @@ const AppContext = createContext();
 
 const AppContextProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
+  const [user, setUser] = useState(null);
 
 // order from user and save it in local storage
   const [order, setOrder] = useState(() => {
@@ -28,6 +29,14 @@ const AppContextProvider = ({ children }) => {
     localStorage.setItem("orders", JSON.stringify(order));
      
   }, [order,]);
+
+  useEffect(() => {
+  const user = localStorage.getItem("user");
+
+  if (user) {
+    setUser(JSON.parse(user));
+  }
+}, []);
 
 
   // update order 

@@ -143,7 +143,11 @@ const MyOrder = () => {
                         <div>
                           <p className="text-gray-500">Price</p>
                           <h3 className="font-semibold text-gray-800">
-                            ₹{product.normal_price || item.total_price / Math.max(item.quantity || 1, 1)}
+                            ₹{
+                              item.unit === "quintal"
+                                ? item.total_price / Math.max(item.quantity || 1, 1)
+                                : product.normal_price || item.total_price / Math.max(item.quantity || 1, 1)
+                            }
                             /{item.unit || product.unit || "unit"}
                           </h3>
                         </div>

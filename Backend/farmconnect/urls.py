@@ -15,6 +15,8 @@ urlpatterns = [ path('',views.home, name='home'),
                 path('farmer/products/<int:farmer_id>/',views.farmer_products_byId,),
                 #get All Farmers
                 path('farmer/all-farmers/',views.get_allFarmers,),
+                #fetch order of logged in farmer
+                path('farmer/orders/<int:farmer_id>/',views.Farmer_order_byId,),
 
 
 

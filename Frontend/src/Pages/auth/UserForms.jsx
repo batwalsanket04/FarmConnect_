@@ -55,6 +55,8 @@ const UserForms = () => {
 
 
       const res=await axios.post(url,form);
+    localStorage.setItem("token", res.data.access_token);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
 
       if(res.status===200 || res.status===201)
       {
@@ -80,16 +82,16 @@ else
 {
   // Store auth data in a single place for consistency
   const authData = {
-    token: res.data.access_token,
-    role: res.data.role, // Use the role from API response
+    token: res.data.access_token || res.data.token,
+    role: res.data.role || 'user', // Fallback if backend does not return role
     user: res.data.user
   };
   
   localStorage.setItem("auth", JSON.stringify(authData));
   
   // Optional: Also store individual items for backward compatibility
-  localStorage.setItem("token", res.data.access_token);
-  localStorage.setItem("role", res.data.role);
+  localStorage.setItem("token", authData.token);
+  localStorage.setItem("role", authData.role);
 
   nav("/user-dashboard");
 }
@@ -98,7 +100,7 @@ else
      }
      catch(error)
      {
-      setError(error.response?.data?.error );
+      setError(error.response?.data?.error || "something went wrong" );
 
      } finally{
       setLoading(false)

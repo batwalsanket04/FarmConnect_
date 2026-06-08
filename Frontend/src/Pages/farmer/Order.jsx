@@ -8,14 +8,15 @@ import {
 } from "lucide-react";
 
 import { useAppContext } from "../../context/Context";
+import axios from "axios";
 
 const Order = () => {
 
   const { ordersData, setOrdersData } = useAppContext();
 
-  useEffect(() => {
-    localStorage.setItem("orders", JSON.stringify(ordersData));
-  }, [ordersData]);
+  // useEffect(() => {
+  //   localStorage.setItem("orders", JSON.stringify(ordersData));
+  // }, [ordersData]);
 
   // UPDATE STATUS
   const updateStatus = (id, newStatus) => {
@@ -28,6 +29,38 @@ const Order = () => {
 
     setOrdersData(updatedOrders);
   };
+
+ 
+
+ 
+
+  
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const auth = JSON.parse(localStorage.getItem('auth'))
+      const farmerId = auth?.farmer?.id
+      if (!farmerId) {
+        console.error('Farmer auth not found')
+        return
+      }
+
+      try {
+        const res = await axios.get(
+          `http://127.0.0.1:8000/api/farmer/orders/${farmerId}/`,
+        )
+        if (res.status === 200) {
+          setOrdersData(res.data)
+          console.log('Fetched orders:', res.data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch orders:', error)
+      }
+    }
+
+    fetchOrders()
+  }, [setOrdersData])
+     
+
 
   return (
 
@@ -79,7 +112,7 @@ const Order = () => {
                     </p>
 
                     <p className="text-gray-500">
-                      Total Amount: ₹{item.totalPrice}
+                      Total Amount: ₹{item.total_price}
                     </p>
 
                     <p className="text-gray-500">
@@ -174,8 +207,8 @@ const Order = () => {
                     >
 
                       <img
-                        src={product.image}
-                        alt={product.name}
+                       src={`http://127.0.0.1:8000${product.image}`}
+                       alt={product.product_name}
                         className="w-16 h-16 rounded-xl object-cover"
                       />
 

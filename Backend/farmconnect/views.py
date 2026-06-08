@@ -257,7 +257,7 @@ def Create_Order(request):
             unit = item.get('unit') or 'kg'
 
             if unit == 'quintal':
-                total_price = product.bulk_price * quantity
+                total_price = product.bulk_price * quantity * 100
             else:
                 total_price = product.normal_price * quantity
 
@@ -291,7 +291,7 @@ def Create_Order(request):
     unit = data.get('unit') or 'kg'
 
     if unit == 'quintal':
-        total_price = product.bulk_price * quantity
+        total_price = product.bulk_price * quantity * 100
     else:
         total_price = product.normal_price * quantity
 
@@ -399,4 +399,18 @@ def User_order_byId(request,user_id):
     serializer=UserOrderSerializer(order,many=True)
 
     return Response(serializer.data,status=200)
+
+
+# fetch orders of logged in farmer
+
+@api_view(['GET'])
+@csrf_exempt
+def Farmer_order_byId(request,farmer_id):
+    # filter UserOrder by the farmer who owns the product
+    orders = UserOrder.objects.filter(product__farmer_id=farmer_id).order_by('-created_at')
+    serializer = UserOrderSerializer(orders, many=True)
+    return Response(serializer.data, status=200)
+
+ 
+
 

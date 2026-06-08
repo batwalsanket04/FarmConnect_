@@ -87,7 +87,7 @@ const end=start + Page_size
           <p className='text-sm text-gray-600'>
             Available:
             <span className='font-bold text-emerald-700 ml-1'>
-              {product.quantity}/kg
+              {product.quantity}{product.unit}
             </span>
           </p>
 

@@ -59,17 +59,27 @@ const getItemQuantity = (item) => {
   );
 };
 
+// helper to compute an item's unit price for the current unit
+const getItemUnitPrice = (item) => {
+  const unit = (productUnit && productUnit[item.id]) || "kg";
+  const normalPrice = Number(item.normal_price) || 0;
+  const bulkPrice = Number(item.bulk_price) || 0;
+
+  return unit === "quintal"
+    ? bulkPrice * 100 // bulk price is stored per kg, so one quintal is 100 kg
+    : normalPrice;
+};
+
 // helper to compute an item's total price
 const getItemTotal = (item) => {
   const qty = getItemQuantity(item);
-  const unit = (productUnit && productUnit[item.id]) || "kg";
+  const unitPrice = getItemUnitPrice(item);
 
-  if (unit === "quintal") {
-    return item.bulk_price * qty * 100;
-  }
-
-  return item.normal_price * qty;
+  return unitPrice * qty;
 };
+
+
+
 
   const [success, setSuccess] = useState(false);
  
@@ -212,7 +222,7 @@ const getItemTotal = (item) => {
     }
 
     try {
-      await axios.post('http://127.0.0.1:8000/api/order/create/', orderData);
+     const res= await axios.post('http://127.0.0.1:8000/api/order/create/', orderData);
       alert(res.data.message || 'Order placed successfully!');
     } catch (backendError) {
       console.error('COD order creation failed:', backendError);
@@ -465,6 +475,8 @@ const getItemTotal = (item) => {
                 key={item.id}
                 item={item}
                 totalPrice={getItemTotal(item)}
+                unit={productUnit[item.id] || "kg"}
+                unitPrice={getItemUnitPrice(item)}
                 removeItem={removeItem}
                 productQuantity={productQuantity}
               />

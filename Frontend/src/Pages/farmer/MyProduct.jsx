@@ -1,43 +1,35 @@
 import { Heart } from 'lucide-react'
-import React, { useContext, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useAppContext } from '../../context/Context'
 import axios from 'axios'
 
 const MyProduct = () => {
-  
-  const {farmerProduct,setfarmerProduct}=useAppContext()
+  const { farmerProduct, setfarmerProduct } = useAppContext()
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const auth = JSON.parse(localStorage.getItem('auth'))
+      const farmerId = auth?.farmer?.id
+      if (!farmerId) {
+        console.error('Farmer auth not found')
+        return
+      }
 
-
-  useEffect(()=>{
-    
-
-    const fetchProducts=async()=>{
-
-      try
-      {
-        const res=await axios.get(" http://127.0.0.1:8000/api/farmer/get-products/");
-
-        if(res.status===200)
-        {
-          setfarmerProduct(res.data);
-          console.log(farmerProduct);
-          console.log("Fetched products:", res.data);
+      try {
+        const res = await axios.get(
+          `http://127.0.0.1:8000/api/farmer/products/${farmerId}/`,
+        )
+        if (res.status === 200) {
+          setfarmerProduct(res.data)
+          console.log('Fetched products:', res.data)
         }
-
+      } catch (error) {
+        console.error('Error fetching products:', error)
       }
-      catch(error)
-      {
-        console.error("Error fetching products:", error);
-
-      }
-
-
-
     }
-    fetchProducts();
 
-  },[])
+    fetchProducts()
+  }, [setfarmerProduct])
   const product_length=farmerProduct.length;
 
 

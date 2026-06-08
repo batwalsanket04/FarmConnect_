@@ -75,8 +75,8 @@ const FarmerForms = () => {
         {
           // Store auth data in a consistent format
           const authData = {
-            token: res.data.access_token,
-            role: res.data.role, // Use the role from API response
+            token: res.data.access_token || res.data.token,
+            role: res.data.role || 'farmer', // Fallback to farmer if backend does not return role
             farmer: res.data.farmer
           };
           
@@ -84,7 +84,8 @@ const FarmerForms = () => {
           localStorage.setItem("farmer_id", res.data.farmer.id);
           
           // Optional: Also store token separately for backward compatibility
-          localStorage.setItem("farmerToken", res.data.access_token);
+          localStorage.setItem("farmerToken", authData.token);
+          localStorage.setItem("role", authData.role);
           
           nav("/farmer-dashboard");
         }

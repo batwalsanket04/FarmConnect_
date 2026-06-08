@@ -7,7 +7,9 @@ const CartItem = ({
   item,
   removeItem,
   productQuantity,
-  totalPrice
+  totalPrice,
+  unit,
+  unitPrice
 }) => {
   return (
     <div className="bg-white rounded-3xl shadow-md p-4 flex flex-col sm:flex-row gap-5">
@@ -29,7 +31,7 @@ const CartItem = ({
             </h2>
 
             <p className="text-emerald-700 font-semibold mt-1">
-              ₹{totalPrice}/kg
+              ₹{unitPrice}/{unit}
             </p>
 
           </div>
@@ -46,7 +48,7 @@ const CartItem = ({
         <div className="mt-5 flex items-center justify-between">
 
           <p className="text-xl font-bold text-emerald-700">
-            ₹{item.normal_price * (productQuantity[item.id] || 1)}
+            ₹{totalPrice}
           </p>
 
         </div>

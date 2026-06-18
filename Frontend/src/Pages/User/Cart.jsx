@@ -125,10 +125,22 @@ const getItemTotal = (item) => {
         name: "Farm Connect",
         handler: async function (response) {
           console.log("Razorpay response:", response);
-          setCart([]);
-          setProductQuantity({});
-          setOrder((prev) => [...prev, orderData]);
-          setSuccess(true);
+          try {
+            const res = await axios.post(
+              "http://127.0.0.1:8000/api/order/create/",
+              orderData
+            );
+            alert(res.data.message || "Order placed successfully!");
+            setOrder((prev) => [...prev, orderData]);
+            setCart([]);
+            setProductQuantity({});
+            setSuccess(true);
+          } catch (backendError) {
+            console.error("Failed to save UPI order on backend:", backendError);
+            alert(
+              "Payment succeeded, but order save failed. Please contact support."
+            );
+          }
         },
       };
 

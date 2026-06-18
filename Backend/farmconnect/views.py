@@ -10,6 +10,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework.response import Response
+from django.db.models import Sum
 from .models import Farmer, FarmerProduct,User, UserOrder
 from django.contrib.auth.hashers import make_password
 from .serializer import FarmerRegistrationSerializer,UserRegistrationSerializer,FarmerProductSerializer,UserOrderSerializer
@@ -340,6 +341,7 @@ def add_product(request):
         category=data.get('category'),
         variety=data.get('variety'),
         quantity=data.get('quantity'),
+        unit=data.get('unit') or 'kg',
         normal_price=data.get('normal_price'),
         bulk_price=data.get('bulk_price'),
         description=data.get('description'),
@@ -401,6 +403,26 @@ def User_order_byId(request,user_id):
     return Response(serializer.data,status=200)
 
 
+# farmer dashboard statistics
+@api_view(['GET'])
+@csrf_exempt
+
+def Farmer_dashboard_stats(request, farmer_id):
+    orders = UserOrder.objects.filter(product__farmer_id=farmer_id).order_by('-created_at')
+    serializer = UserOrderSerializer(orders, many=True)
+
+    total_earnings = orders.filter(status='delivered').aggregate(total=Sum('total_price'))['total'] or 0
+    pending_count = orders.filter(status='pending').count()
+    total_orders = orders.count()
+
+    return Response({
+        'orders': serializer.data,
+        'total_earnings': float(total_earnings),
+        'pending_count': pending_count,
+        'total_orders': total_orders,
+    }, status=200)
+
+
 # fetch orders of logged in farmer
 
 @api_view(['GET'])
@@ -409,8 +431,65 @@ def Farmer_order_byId(request,farmer_id):
     # filter UserOrder by the farmer who owns the product
     orders = UserOrder.objects.filter(product__farmer_id=farmer_id).order_by('-created_at')
     serializer = UserOrderSerializer(orders, many=True)
-    return Response(serializer.data, status=200)
-
- 
+    return Response(serializer.data, status=200) 
 
 
+# view user orders by thier id 
+
+@api_view(['GET'])
+@csrf_exempt
+
+def view_order_byId(request,item_id):
+    try:
+        order = UserOrder.objects.get(id=item_id)
+        serializer = UserOrderSerializer(order)
+        return Response(serializer.data, status=200)
+    except UserOrder.DoesNotExist:
+        return Response({"error": "Order not found"}, status=404)
+
+
+# update order status
+
+@api_view(['PATCH', 'PUT'])
+@csrf_exempt
+def update_order_status(request, order_id):
+    """Update the status of an order"""
+    try:
+        order = UserOrder.objects.get(id=order_id)
+    except UserOrder.DoesNotExist:
+        return Response({"error": "Order not found"}, status=404)
+    
+    new_status = request.data.get('status')
+    
+    if not new_status:
+        return Response({"error": "Status is required"}, status=400)
+    
+    valid_statuses = ['pending', 'accepted', 'shipped', 'delivered', 'rejected']
+    if new_status not in valid_statuses:
+        return Response({"error": f"Invalid status. Must be one of {valid_statuses}"}, status=400)
+    
+    order.status = new_status
+    order.save()
+    
+    serializer = UserOrderSerializer(order)
+    return Response({
+        "message": "Order status updated successfully",
+        "order": serializer.data
+    }, status=200)
+
+
+@api_view(['DELETE'])
+@csrf_exempt
+
+def delete_product(request,product_id):
+    try:
+        product=FarmerProduct.objects.get(id=product_id)
+        product.delete()
+        return Response({
+            "message":"Product Deleted Successfully"
+        },status=200)
+    
+    except FarmerProduct.DoesNotExist:
+        return Response({
+            "error":"Product not found"
+        },status=404)

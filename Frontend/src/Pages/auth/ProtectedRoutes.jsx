@@ -12,9 +12,20 @@ const ProtectedRoutes = ({ children, allowedRole }) => {
     }
 
     // If allowedRole is specified and user role doesn't match
-    if (allowedRole && auth.role !== allowedRole) {
-      console.warn(`Access denied: Required role '${allowedRole}', but user has role '${auth.role}'`);
-      return <Navigate to="/" replace />;
+    if (allowedRole) {
+      const buyerRoles = ['user', 'customer', 'retailer', 'wholesaler'];
+      const isBuyerRoute = allowedRole === 'user';
+      const hasBuyerRole = buyerRoles.includes(auth.role);
+
+      if (isBuyerRoute && !hasBuyerRole) {
+        console.warn(`Access denied: Required buyer role, but auth role is '${auth.role}'`);
+        return <Navigate to="/" replace />;
+      }
+
+      if (!isBuyerRoute && auth.role !== allowedRole) {
+        console.warn(`Access denied: Required role '${allowedRole}', but user has role '${auth.role}'`);
+        return <Navigate to="/" replace />;
+      }
     }
 
     return children;

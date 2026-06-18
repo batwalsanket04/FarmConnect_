@@ -7,6 +7,9 @@ import { useNavigate } from 'react-router-dom'
 const DashboardHome = () => {
 
 const [product,setProduct]=useState([])
+const [orders,setOrders]=useState([])
+const [pendingOrders,setPendingOrder]=useState(0);
+const [earnings,setEarnings]=useState(0);
 const nav=useNavigate();
 
 
@@ -14,14 +17,34 @@ useEffect(()=>{
 
   const fetchData=async()=>{
 
-  
 try{
   const auth= JSON.parse(localStorage.getItem("auth"));
-  const id=auth?.farmer?.id;
+  const farmerId=auth?.farmer?.id;
+      if (!farmerId) {
+        console.error('Farmer auth not found')
+        return
+      }
 
-  const res=await axios.get(`http://127.0.0.1:8000/api/farmer/products/${id}/`)
+  // Fetch products
+  const productRes=await axios.get(`http://127.0.0.1:8000/api/farmer/products/${farmerId}/`);
+  setProduct(productRes.data);
 
-  setProduct(res.data);
+  // Fetch dashboard stats
+  const statsRes = await axios.get(
+    `http://127.0.0.1:8000/api/farmer/orders/dashboard-stats/${farmerId}/`
+  );
+
+  const stats = statsRes.data || {};
+  const ordersData = Array.isArray(stats.orders) ? stats.orders : [];
+
+  setOrders(ordersData);
+  setPendingOrder(stats.pending_count || 0);
+  setEarnings(stats.total_earnings || 0);
+
+  console.log('Dashboard stats:', stats);
+  
+
+
 
 
   }
@@ -103,7 +126,7 @@ fetchData();
                 </h2>
 
                 <p className='text-3xl font-bold text-emerald-700 mt-2'>
-                  24
+                  {orders.length}
                 </p>
 
               </div>
@@ -135,7 +158,7 @@ fetchData();
                   />
 
                   <p className='text-3xl font-bold text-emerald-700'>
-                    15K
+                    {earnings}
                   </p>
 
                 </div>
@@ -162,7 +185,7 @@ fetchData();
                 </h2>
 
                 <p className='text-3xl font-bold text-orange-500 mt-2'>
-                  5
+                  {pendingOrders}
                 </p>
 
               </div>
@@ -188,7 +211,7 @@ fetchData();
             <div className='flex items-center justify-between mb-5'>
 
               <h2 className='text-xl font-semibold text-emerald-700'>
-                Recent Products
+                Recent Orders
               </h2>
 
               <button onClick={()=>nav('/farmer-dashboard/add')} className='bg-emerald-600 text-white px-4 py-2 rounded-lg cursor-pointer '>
@@ -197,50 +220,27 @@ fetchData();
 
             </div>
 
-            <div className='space-y-4'>
-
-              <div className='flex items-center justify-between border-b pb-4'>
-
-                <div>
-
-                  <h3 className='font-semibold'>
-                    Fresh Tomatoes
-                  </h3>
-
-                  <p className='text-sm text-gray-500'>
-                    20 KG Available
-                  </p>
-
+           { (orders.length===0)?(
+              <div className='text-center text-gray-500'>No orders received yet</div>
+            )
+            :(
+              <div className='space-y-4'>
+                {orders.slice(0, 2).map((item) => (
+                  <div key={item.id} className='flex items-center justify-between border-b pb-4'>
+                    <div>
+                    <h3 className='font-semibold'>
+                      Order #{item.id} - {item.product?.product_name || 'Unknown Product'}
+                    </h3>
+                    <p className='text-sm text-gray-500'>
+                      Ordered {item.quantity} {item.unit || ''}
+                    </p>
+                  </div>
+                  <button onClick={()=>nav(`/farmer-dashboard/view-order/${item.id}`)} className='bg-emerald-600 text-white px-4 py-2 rounded-lg'>
+                    View
+                  </button>
                 </div>
-
-                <button className='bg-emerald-600 text-white px-4 py-2 rounded-lg'>
-                  View
-                </button>
-
-              </div>
-
-
-              <div className='flex items-center justify-between border-b pb-4'>
-
-                <div>
-
-                  <h3 className='font-semibold'>
-                    Organic Potatoes
-                  </h3>
-
-                  <p className='text-sm text-gray-500'>
-                    50 KG Available
-                  </p>
-
-                </div>
-
-                <button className='bg-emerald-600 text-white px-4 py-2 rounded-lg'>
-                  View
-                </button>
-
-              </div>
-
-            </div>
+              ))}
+            </div>)}
 
           </div>
 
@@ -298,9 +298,10 @@ fetchData();
         </div>
 
       </div>
-
     </div>
+ 
   )
 }
+
 
 export default DashboardHome

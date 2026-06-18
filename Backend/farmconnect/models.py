@@ -138,6 +138,19 @@ class FarmerProduct(models.Model):
 
     quantity = models.IntegerField()
 
+    UNIT_CHOICES = ( ("kg","Kg"),
+                     ("quintal","Quintal"),
+                     ("ton","Ton"),
+                     ("liter","Liter"),
+                     ("dozen","Dozen")
+    )
+
+    unit = models.CharField(
+        max_length=20,
+        choices=UNIT_CHOICES,
+        
+    )
+
     normal_price = models.DecimalField(
         max_digits=10,
         decimal_places=2
@@ -196,6 +209,7 @@ class UserOrder(models.Model):
         ('accepted', 'Accepted'),
         ('shipped', 'Shipped'),
         ('delivered', 'Delivered'),
+        ('rejected', 'Rejected'),
     ]
 
     name = models.CharField(

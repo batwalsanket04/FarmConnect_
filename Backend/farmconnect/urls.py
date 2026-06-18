@@ -17,6 +17,10 @@ urlpatterns = [ path('',views.home, name='home'),
                 path('farmer/all-farmers/',views.get_allFarmers,),
                 #fetch order of logged in farmer
                 path('farmer/orders/<int:farmer_id>/',views.Farmer_order_byId,),
+                path('farmer/orders/dashboard-stats/<int:farmer_id>/',views.Farmer_dashboard_stats,),
+                path('farmer/orders/view-order/<int:item_id>/',views.view_order_byId,),
+                path('farmer/orders/update-status/<int:order_id>/',views.update_order_status,),
+                path('farmer/product/delete/<int:product_id>/',views.delete_product),
 
 
 

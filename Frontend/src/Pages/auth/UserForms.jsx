@@ -80,11 +80,15 @@ const UserForms = () => {
        // Login Success
 else
 {
-  // Store auth data in a single place for consistency
+  // Map buyer-related backend roles into a normalized frontend role
+  const buyerRoles = ['customer', 'retailer', 'wholesaler', 'user'];
+  const normalizedRole = buyerRoles.includes(res.data.role) ? 'user' : res.data.role || 'user';
+
   const authData = {
     token: res.data.access_token || res.data.token,
-    role: res.data.role || 'user', // Fallback if backend does not return role
-    user: res.data.user
+    role: normalizedRole,
+    user: res.data.user,
+    userType: res.data.role || 'customer'
   };
   
   localStorage.setItem("auth", JSON.stringify(authData));

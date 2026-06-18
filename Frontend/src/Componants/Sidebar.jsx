@@ -12,7 +12,8 @@ import {
   Bell,
   Search,
   Home,
-  ShoppingBag
+  ShoppingBag,
+  HomeIcon
 } from 'lucide-react'
 
 import { Link, Navigate, useNavigate } from 'react-router-dom'
@@ -106,7 +107,7 @@ const Sidebar = ({ type = "farmer" }) => {
           {/* DASHBOARD */}
 
           <button
-          onClick={()=>navigate(-1)}
+          onClick={() => navigate(type === 'farmer' ? '/farmer-dashboard' : '/user-dashboard')}
             className='w-full flex items-center gap-3 bg-white text-emerald-700 px-4 py-3 rounded-xl font-semibold shadow-md'
           >
 
@@ -121,6 +122,17 @@ const Sidebar = ({ type = "farmer" }) => {
 
           {type === "farmer" && (
             <>
+
+            <button
+                onClick={() => navigate('/farmer-dashboard')}
+                className='w-full flex items-center gap-3 hover:bg-emerald-600 px-4 py-3 rounded-xl transition-all duration-300'
+              >
+
+                <HomeIcon size={20} />
+
+                Home
+
+              </button>
 
               <button
                 onClick={() => navigate('/farmer-dashboard/my-product')}

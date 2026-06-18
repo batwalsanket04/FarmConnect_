@@ -16,6 +16,7 @@ const AddProduct = () => {
     category:'',
     variety: '',
     quantity: '',
+    unit:'kg',
     normal_price: '',
     bulk_price: '',
     description: '',
@@ -108,6 +109,7 @@ const submitForm = async (e) => {
     category:'',
     variety: '',
     quantity: '',
+    unit: 'kg',
     normal_price: '',
     bulk_price: '',
     description: '',
@@ -272,6 +274,25 @@ const submitForm = async (e) => {
         />
 
       </div>
+
+      <div>
+  <label className="block mb-1 text-sm font-medium text-gray-700">
+    Unit
+  </label>
+
+  <select
+    name="unit"
+    value={addfarmerProduct.unit}
+    onChange={handleForm}
+    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500"
+  >
+    <option value="kg">Kg</option>
+    <option value="quintal">Quintal</option>
+    <option value="ton">Ton</option>
+    <option value="liter">Liter</option>
+    <option value="dozen">Dozen</option>
+  </select>
+</div>
 
 
       <div>

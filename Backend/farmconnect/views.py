@@ -382,6 +382,19 @@ def farmer_products_byId(request, farmer_id):
 
     return Response(serializer.data)
 
+
+@api_view(['GET'])
+@csrf_exempt
+def get_product_by_id(request, product_id):
+    try:
+        product = FarmerProduct.objects.get(id=product_id)
+    except FarmerProduct.DoesNotExist:
+        return Response({'error': 'Product not found'}, status=404)
+
+    serializer = FarmerProductSerializer(product)
+    return Response(serializer.data, status=200)
+
+
 @api_view(['GET'])
 @csrf_exempt
 
@@ -493,3 +506,29 @@ def delete_product(request,product_id):
         return Response({
             "error":"Product not found"
         },status=404)
+
+@api_view(['PUT'])
+@csrf_exempt
+
+def edit_product(request,id):
+    try:
+        product= FarmerProduct.objects.get(id=id)
+        
+    except FarmerProduct.DoesNotExist:
+        return Response({
+            "error":"Product not found"
+        },status=404)
+    
+    serializer=FarmerProductSerializer(product,data=request.data,partial=True)
+    
+    if serializer.is_valid():
+        serializer.save()
+        return Response({
+            "message":"Product Updated Successfully",
+            "product":serializer.data
+        },status=200)
+    
+    return Response(serializer.errors,status=400)
+
+
+

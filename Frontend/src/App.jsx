@@ -29,6 +29,7 @@ import ProtectedRoutes from './Pages/auth/ProtectedRoutes'
 import Farmers from './Componants/Farmers'
 import FarmerProducts from './Componants/farmerProducts'
 import ViewOrderDetail from './Pages/farmer/viewOrderDetail'
+import EditFarmerProduct from './Componants/EditFarmerProduct'
  
 
 const App = () => {
@@ -113,9 +114,11 @@ const {farmerProduct}=useAppContext();
         <Route path='/farmer-dashboard' element={<ProtectedRoutes allowedRole="farmer"><FarmerDashboard /></ProtectedRoutes>}>
           <Route index element={<DashboardHome />} />
           <Route path='my-product' element={<MyProduct />} />
+          <Route path='edit-product/:id' element={<EditFarmerProduct/>} />
           <Route path='add' element={<AddProducts />} />
           <Route path='order' element={<Order />} />
           <Route path='view-order/:id' element={<ViewOrderDetail/>}/>
+
         </Route>
 
         {/* FALLBACK ROUTE */}

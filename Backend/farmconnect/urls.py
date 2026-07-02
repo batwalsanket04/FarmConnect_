@@ -13,6 +13,7 @@ urlpatterns = [ path('',views.home, name='home'),
                path('farmer/get-products/',views.get_products,),
                #farmer product by id
                 path('farmer/products/<int:farmer_id>/',views.farmer_products_byId,),
+                path('farmer/product/<int:product_id>/',views.get_product_by_id,),
                 #get All Farmers
                 path('farmer/all-farmers/',views.get_allFarmers,),
                 #fetch order of logged in farmer
@@ -21,6 +22,8 @@ urlpatterns = [ path('',views.home, name='home'),
                 path('farmer/orders/view-order/<int:item_id>/',views.view_order_byId,),
                 path('farmer/orders/update-status/<int:order_id>/',views.update_order_status,),
                 path('farmer/product/delete/<int:product_id>/',views.delete_product),
+                #update farmer product
+                path('farmer/product/edit/<int:id>/',views.edit_product),
 
 
 

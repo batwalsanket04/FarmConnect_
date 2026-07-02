@@ -50,6 +50,7 @@ const FarmerForms = () => {
       const url=isLogin?"http://127.0.0.1:8000/api/farmer/login/":"http://127.0.0.1:8000/api/farmer/register/";
 
       const res=await axios.post(url,form);
+      console.log(res.data)
 
       if(res.status===200 || res.status===201)
       {

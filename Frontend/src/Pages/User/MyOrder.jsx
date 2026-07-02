@@ -47,148 +47,139 @@ const MyOrder = () => {
 
   return (
 
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 p-4">
+   <div className="in-h-screen bg-slate-50 px-6 py-8">
+  {/* Header */}
+  <div className="flex items-center justify-between mb-8">
+    <div>
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900">My Orders</h1>
+      <p className="text-gray-500 text-sm">
+        {orders.length} Orders
+      </p>
+    </div>
+  </div>
 
-      {/* HEADER */}
-      <div className="flex items-center justify-between mb-5">
+  {loading ? (
+    <div className="text-center py-20 text-gray-500">
+      Loading Orders...
+    </div>
+  ) : orders.length === 0 ? (
+    <div className="bg-white rounded-xl border p-10 text-center">
+      <Package className="mx-auto text-gray-400 mb-3" size={40} />
+      <h2 className="font-semibold text-lg">No Orders Found</h2>
+      <p className="text-gray-500 text-sm mt-1">
+        You haven't placed any orders yet.
+      </p>
+    </div>
+  ) : (
+    <div className="space-y-4">
+      {orders.map((item) => {
+        const product = item.product || {};
 
-        <div>
+        return (
+          <div
+            key={item.id}
+            className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300"
+          >
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* Image */}
+              <img
+                src={
+                  product.product_image
+                    ? `http://127.0.0.1:8000${product.product_image}`
+                    : "https://via.placeholder.com/100"
+                }
+                alt={product.product_name}
+                className="w-24 h-24 rounded-2xl object-cover shadow-sm"
+              />
 
-          <h1 className="text-3xl font-bold text-emerald-700">
-            My Orders
-          </h1>
-
-          <p className="text-sm text-gray-600 mt-1">
-            Recent Orders
-          </p>
-
-        </div>
-
-        <div className="bg-emerald-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 shadow">
-
-          <Package size={18} />
-
-          <span className="font-semibold text-sm">
-            {orders.length} Orders
-          </span>
-
-        </div>
-
-      </div>
-
-      {/* ORDERS */}
-      <div className="space-y-4">
-        {loading ? (
-          <div className="text-center text-gray-500">Loading orders...</div>
-        ) : orders.length === 0 ? (
-          <div className="bg-white rounded-3xl shadow-md p-10 text-center">
-            <p className="text-xl font-semibold text-gray-700">No orders found</p>
-            <p className="text-sm text-gray-500">You haven't placed any orders yet.</p>
-          </div>
-        ) : (
-          orders.map((item) => {
-            const product = item.product || {};
-            return (
-              <div
-                key={item.id}
-                className="bg-white rounded-2xl shadow-md overflow-hidden border border-emerald-100"
-              >
-                {/* TOP */}
-                <div className="bg-emerald-600 text-white px-4 py-3 flex items-center justify-between">
+              {/* Details */}
+              <div className="flex-1">
+                <div className="flex justify-between">
                   <div>
-                    <h2 className="font-bold text-lg">Order #{item.id}</h2>
-                    <div className="flex items-center gap-2 text-xs text-emerald-100 mt-1">
-                      <CalendarDays size={14} />
-                      {item.created_at || item.orderdate || "Unknown date"}
-                    </div>
+                    <h2 className="text-xl font-bold text-slate-800">
+                      {product.product_name}
+                    </h2>
+
+                    <p className="text-sm text-slate-500">
+                      Order #{item.id}
+                    </p>
+
+                    <p className="text-sm text-slate-500">
+                      {item.created_at || item.orderdate}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="bg-white text-emerald-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                      <BadgeCheck size={14} />
-                      {item.status}
-                    </span>
-                    <a
-                      href={`tel:${item.phone}`}
-                      className="bg-white text-emerald-700 p-2 rounded-full hover:bg-emerald-100 transition"
-                    >
-                      <PhoneCall size={16} />
-                    </a>
+<span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 font-medium">
+  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100">
+    <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+  </span>
+  {item.status}
+</span>
+                </div>
+
+                {/* Info */}
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                 <div className="bg-slate-50 rounded-xl p-4">
+                   <p className="text-xs uppercase tracking-wide text-slate-400">Price</p>
+                  <p className="font-bold text-slate-800 mt-1">
+                      ₹
+                      {item.unit === "quintal"
+                        ? item.total_price /
+                          Math.max(item.quantity || 1, 1)
+                        : product.normal_price ||
+                          item.total_price /
+                            Math.max(item.quantity || 1, 1)}
+                    </p>
+                  </div>
+
+                   <div className="bg-slate-50 rounded-xl p-4">
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Quantity</p>
+                    <p className="font-bold text-slate-800 mt-1">
+                      {item.quantity} {item.unit}
+                    </p>
+                  </div>
+
+                   <div className="bg-slate-50 rounded-xl p-4">
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Payment</p>
+                    <p className="font-bold text-slate-800 mt-1">{item.payment}</p>
+                  </div>
+
+                   <div className="bg-slate-50 rounded-xl p-4">
+                    <p className="text-xs uppercase tracking-wide text-slate-400">Total</p>
+                    <p className="font-semibold text-green-600">
+                      ₹{item.total_price}
+                    </p>
                   </div>
                 </div>
 
-                {/* PRODUCT */}
-                <div className="p-4 space-y-3">
-                  <div className="flex items-center gap-3 border rounded-2xl p-3 hover:bg-emerald-50 transition">
-                    <img
-                      src={
-                        product.product_image
-                          ? `http://127.0.0.1:8000${product.product_image}`
-                          : "https://via.placeholder.com/80"
-                      }
-                      alt={product.product_name || "Product image"}
-                      className="w-20 h-20 rounded-xl object-cover"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <h2 className="font-bold text-gray-800">
-                            {product.product_name || `Product #${product.id || item.product}`}
-                          </h2>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Product ID : {product.id || item.product}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-5 mt-3 text-sm flex-wrap">
-                        <div>
-                          <p className="text-gray-500">Price</p>
-                          <h3 className="font-semibold text-gray-800">
-                            ₹{
-                              item.unit === "quintal"
-                                ? item.total_price / Math.max(item.quantity || 1, 1)
-                                : product.normal_price || item.total_price / Math.max(item.quantity || 1, 1)
-                            }
-                            /{item.unit || product.unit || "unit"}
-                          </h3>
-                        </div>
-                        <div>
-                          <p className="text-gray-500">Qty</p>
-                          <h3 className="font-semibold text-gray-800">
-                            {item.quantity} {item.unit}
-                          </h3>
-                        </div>
-                        <div>
-                          <p className="text-gray-500">Payment</p>
-                          <h3 className="font-semibold text-gray-800">{item.payment}</h3>
-                        </div>
-                      </div>
-                    </div>
+                {/* Address */}
+                <div className="mt-6 pt-5 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-600">
+                  <div className="space-y-1">
+                    <p className="flex items-center gap-2">
+                      <Phone size={15} />
+                      {item.phone}
+                    </p>
+
+                    <p className="flex items-center gap-2">
+                      <MapPin size={15} />
+                      {item.address}
+                    </p>
                   </div>
 
-                  <div className="border-t pt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                    <div className="space-y-1 text-sm text-gray-600">
-                      <p className="flex items-center gap-2">
-                        <Phone size={15} className="text-emerald-600" />
-                        {item.phone}
-                      </p>
-                      <p className="flex items-center gap-2">
-                        <MapPin size={15} className="text-emerald-600" />
-                        {item.address}
-                      </p>
-                    </div>
-                    <div className="text-left md:text-right">
-                      <p className="text-xs text-gray-500">Total Amount</p>
-                      <h1 className="text-3xl font-bold text-emerald-700">₹{item.total_price}</h1>
-                    </div>
-                  </div>
+                  <a
+                    href={`tel:${item.phone}`}
+                    className="self-start md:self-center bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl shadow-sm transition-all duration-300"
+                  >
+                    Call
+                  </a>
                 </div>
               </div>
-            );
-          })
-        )}
-      </div>
-
+            </div>
+          </div>
+        );
+      })}
     </div>
+  )}
+</div>
 
   );
 };

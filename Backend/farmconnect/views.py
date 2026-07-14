@@ -16,11 +16,27 @@ from django.contrib.auth.hashers import make_password
 from .serializer import FarmerRegistrationSerializer,UserRegistrationSerializer,FarmerProductSerializer,UserOrderSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import check_password
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
  
 
 
 # Create your views here.
+
+
+def build_jwt_tokens(user_obj, role):
+    access = AccessToken()
+    access['user_id'] = user_obj.id
+    access['role'] = role
+    access['email'] = getattr(user_obj, 'email', '')
+    access['name'] = getattr(user_obj, 'farmer_name', None) or getattr(user_obj, 'name', '') or ''
+
+    refresh = RefreshToken()
+    refresh['user_id'] = user_obj.id
+    refresh['role'] = role
+    refresh['email'] = getattr(user_obj, 'email', '')
+    refresh['name'] = getattr(user_obj, 'farmer_name', None) or getattr(user_obj, 'name', '') or ''
+
+    return str(access), str(refresh)
 
 def home(request):
     return HttpResponse("Api Working")
@@ -87,14 +103,12 @@ def Farmer_Login(request):
         return Response({'error': 'Invalid Email'}, status=400)
 
     if check_password(password, farmer.password):
-        refresh = RefreshToken.for_user(farmer)
-        refresh['farmer_id'] = farmer.id
-        refresh['email'] = farmer.email
+        access_token, refresh_token = build_jwt_tokens(farmer, 'farmer')
 
         return Response({
             'message': 'Login Successful',
-            'access_token': str(refresh.access_token),
-            'refresh_token': str(refresh),
+            'access_token': access_token,
+            'refresh_token': refresh_token,
             'role': 'farmer',
             'farmer': {
                 'id': farmer.id,
@@ -105,6 +119,26 @@ def Farmer_Login(request):
         }, status=200)
 
     return Response({'error': 'Invalid Password'}, status=400)
+
+
+@api_view(['POST'])
+@csrf_exempt
+def Farmer_Forgot_Password(request):
+    email = request.data.get('email')
+    new_password = request.data.get('new_password') or request.data.get('password')
+
+    if not email or not new_password:
+        return Response({'error': 'Email and new password are required'}, status=400)
+
+    try:
+        farmer = Farmer.objects.get(email=email)
+    except Farmer.DoesNotExist:
+        return Response({'error': 'Farmer account not found'}, status=404)
+
+    farmer.password = make_password(new_password)
+    farmer.save()
+
+    return Response({'message': 'Password updated successfully'}, status=200)
 
 
 # User Registration
@@ -142,6 +176,13 @@ def User_Registration(request):
 @api_view(['POST'])
 @csrf_exempt
 
+def logout_user(request):
+    return Response({'message': 'Logged out successfully'}, status=200)
+
+
+@api_view(['POST'])
+@csrf_exempt
+
 def User_login(request):
 
     email=request.data.get('email')
@@ -160,13 +201,11 @@ def User_login(request):
         },status=400)
 
     if check_password(password,user.password):
-        refresh=RefreshToken.for_user(user)
-        refresh['user_id']=user.id
-        refresh['email']=user.email
+        access_token, refresh_token = build_jwt_tokens(user, 'user')
         return Response({
             'message':'Login Successful',
-            'access_token':str(refresh.access_token),
-            'refresh_token':str(refresh),
+            'access_token': access_token,
+            'refresh_token': refresh_token,
             'role':'user',
             'user':{
                 'id':user.id,
@@ -175,6 +214,28 @@ def User_login(request):
                 'location':user.location
             }
         },status=200)
+
+    return Response({'error': 'Invalid Password'}, status=400)
+
+
+@api_view(['POST'])
+@csrf_exempt
+def User_Forgot_Password(request):
+    email = request.data.get('email')
+    new_password = request.data.get('new_password') or request.data.get('password')
+
+    if not email or not new_password:
+        return Response({'error': 'Email and new password are required'}, status=400)
+
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response({'error': 'User account not found'}, status=404)
+
+    user.password = make_password(new_password)
+    user.save()
+
+    return Response({'message': 'Password updated successfully'}, status=200)
 client = razorpay.Client(
     auth=("rzp_test_Sw1AUUWTp2q8vV", "ZhEE4fWlv5kbLawEld10hdSj")
 )

@@ -7,9 +7,12 @@ import {
 } from 'react-router-dom'
 
 import Navbar from './Componants/Navbar'
+import {ToastContainer} from 'react-toastify'
+import "react-toastify/dist/ReactToastify.css";
 
 import UserForms from './Pages/auth/UserForms'
 import FarmerForms from './Pages/auth/FarmerForms'
+import ForgotPassword from './Pages/auth/ForgotPassword'
 import UserDashboard from './Pages/User/UserDashboard'
 import FarmerDashboard from './Pages/farmer/FarmerDashboard'
 import MyProduct from './Pages/farmer/MyProduct'
@@ -23,13 +26,17 @@ import UserNav from './Pages/User/UserNav'
 import MyOrder from './Pages/User/MyOrder'
 import Categories from './Componants/Categories'
 import FallbackPage from './Componants/FallBackPage'
-import Pegination from './Componants/Pegination'
 import { useAppContext } from './context/Context'
 import ProtectedRoutes from './Pages/auth/ProtectedRoutes'
 import Farmers from './Componants/Farmers'
 import FarmerProducts from './Componants/farmerProducts'
 import ViewOrderDetail from './Pages/farmer/viewOrderDetail'
 import EditFarmerProduct from './Componants/EditFarmerProduct'
+import LandingPage from './LandingPage/LandingPage'
+import Features from './LandingPage/Features'
+import About from './LandingPage/About'
+import Statistics from './LandingPage/Statistics'
+import Contact from './LandingPage/Contact'
  
 
 const App = () => {
@@ -40,14 +47,47 @@ const [currentPage,setCurrentpage]=useState(0)
 const {farmerProduct}=useAppContext();
 
 
+
   return (
 
     <BrowserRouter>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick={true}
+        rtl={false}
+        pauseOnFocusLoss={true}
+        draggable={true}
+        pauseOnHover={true}
+        theme="colored"
+        toastStyle={{
+          borderRadius: '18px',
+          background: '#064e3b',
+          color: '#f8fafc',
+          boxShadow: '0 14px 35px rgba(6, 78, 59, 0.18)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+        }}
+        bodyStyle={{
+          fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+          fontSize: '0.95rem',
+          lineHeight: '1.5',
+        }}
+        progressStyle={{
+          background: '#a7f3d0',
+        }}
+      />
 
       <Routes>
+        <Route path='/' element={<LandingPage />} />
+        <Route path='/features' element={<LandingPage />} />
+        <Route path='/about' element={<LandingPage />} />
+        <Route path='/statistics' element={<LandingPage />} />
+        <Route path='/contact' element={<LandingPage />} />
 
         <Route
-          path="/"
+          path="/buyer"
           element={
             <>
               <Navbar />
@@ -62,6 +102,16 @@ const {farmerProduct}=useAppContext();
             <>
               <Navbar />
               <FarmerForms />
+            </>
+          }
+        />
+
+        <Route
+          path="/forgot-password"
+          element={
+            <>
+              <Navbar />
+              <ForgotPassword />
             </>
           }
         />
@@ -82,14 +132,8 @@ const {farmerProduct}=useAppContext();
                 <Products
                   selectedCategory={selectedCategory}
                   currentPage={currentPage}
-                  farmerProduct={farmerProduct}
-                  
+                  setCurrentpage={setCurrentpage}
                 />
-                <Pegination 
-                currentPage={currentPage}
-                setCurrentpage={setCurrentpage}
-                farmerProduct={farmerProduct}
-                  />
               </>
             }
           />

@@ -7,6 +7,7 @@ urlpatterns = [ path('',views.home, name='home'),
                #farmer Apis
                path('farmer/register/',views.Farmer_Register,),
                path('farmer/login/',views.Farmer_Login,),
+               path('farmer/forgot-password/', views.Farmer_Forgot_Password,),
                #add product 
                path('farmer/add-product/',views.add_product,),
                #fetch product farmer
@@ -30,6 +31,8 @@ urlpatterns = [ path('',views.home, name='home'),
                # User Registration and Login
                path('user/register/',views.User_Registration,),
                path('user/login/',views.User_login,),
+               path('user/forgot-password/', views.User_Forgot_Password,),
+               path('logout/',views.logout_user,),
 
                #Create Order
                path('order/create/',views.Create_Order,),

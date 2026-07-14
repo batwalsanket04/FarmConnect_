@@ -42,6 +42,9 @@ const AppContextProvider = ({ children }) => {
   // update order 
   const [ordersData, setOrdersData] = useState(order);
 
+  // global search term (used by navbar search)
+  const [searchTerm, setSearchTerm] = useState('');
+
 
 
    
@@ -49,16 +52,29 @@ const AppContextProvider = ({ children }) => {
   const addToCart = (product) => {
     const exist = cart.find((item) => item.id === product.id);
 
+    // normalize product fields for cart consumers (cartItem expects `image` and `name`)
+    const normalized = {
+      id: product.id,
+      name: product.product_name || product.name || product.title || "",
+      // store image as a path without duplicate leading slash so cart components can prefix the host
+      image: product.product_image
+        ? String(product.product_image).replace(/^\//, "")
+        : product.image
+        ? String(product.image).replace(/^\//, "")
+        : "",
+      normal_price: product.normal_price || product.price || 0,
+      // keep original product data available
+      ...product,
+    };
+
     if (exist) {
       setCart(
         cart.map((item) =>
-          item.id === product.id
-            ? { ...exist, Quantity: exist.Quantity + 1 }
-            : item,
+          item.id === product.id ? { ...item, Quantity: (item.Quantity || 1) + 1 } : item,
         ),
       );
     } else {
-      setCart([...cart, { ...product, Quantity: 1 }]);
+      setCart([...cart, { ...normalized, Quantity: 1 }]);
     }
   };
 
@@ -76,6 +92,7 @@ const AppContextProvider = ({ children }) => {
     setfarmerProduct,
     ordersData,
     setOrdersData
+    ,searchTerm,setSearchTerm
    
   };
 

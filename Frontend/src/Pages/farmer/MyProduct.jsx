@@ -3,6 +3,8 @@ import React, { useEffect } from 'react'
 import { useAppContext } from '../../context/Context'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { API_BASE_URL, assetUrl } from '../../utils/api'
 
 const MyProduct = () => {
   const { farmerProduct, setfarmerProduct } = useAppContext()
@@ -19,7 +21,7 @@ const MyProduct = () => {
 
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/api/farmer/products/${farmerId}/`,
+          `${API_BASE_URL}/api/farmer/products/${farmerId}/`,
         )
         if (res.status === 200) {
           setfarmerProduct(res.data)
@@ -43,12 +45,12 @@ const MyProduct = () => {
 
     try
     {
-      const res=await axios.delete(`http://127.0.0.1:8000/api/farmer/product/delete/${product_id}/`)
+      const res=await axios.delete(`${API_BASE_URL}/api/farmer/product/delete/${product_id}/`)
 
       if(res.status === 200)
       {
         setfarmerProduct((prev)=>prev.filter((item)=>item.id!==product_id))
-        alert("Product deleted successfully")
+        toast.success("Product deleted successfully")
       }
       else
       {
@@ -58,7 +60,7 @@ const MyProduct = () => {
     catch(error)
     {
       console.error("Error deleting product:",error)
-      alert("Failed to delete product. Please try again.")
+      toast.error("Failed to delete product. Please try again.")
     }
 
   }
@@ -97,7 +99,7 @@ const MyProduct = () => {
           <div className="flex flex-col md:flex-row gap-5">
             {/* Image */}
             <img
-              src={`http://127.0.0.1:8000${item.product_image}`}
+              src={assetUrl(item.product_image)}
               alt={item.product_name}
               className="w-28 h-28 rounded-2xl object-cover shadow-sm"
             />

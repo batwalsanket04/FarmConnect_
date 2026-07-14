@@ -7,6 +7,8 @@ import CartItem from "../../Componants/Cart/cartItem";
 import OrderSummary from "../../Componants/Cart/orderSummery";
 import SuccessPage from "../../Componants/Cart/successPage";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { API_BASE_URL, RAZORPAY_KEY } from '../../utils/api';
 
 const Cart = () => {
   const {
@@ -109,7 +111,7 @@ const getItemTotal = (item) => {
   const handleUPIPayment = async (orderData) => {
     try {
       const res = await axios.post(
-        "http://127.0.0.1:8000/api/order/upi-order/",
+        `${API_BASE_URL}/api/order/upi-order/`,
         {
           amount: totalPrice,
         }
@@ -118,7 +120,7 @@ const getItemTotal = (item) => {
       const payment = res.data.payment;
 
       const options = {
-        key: "rzp_test_Sw1AUUWTp2q8vV",
+        key: RAZORPAY_KEY,
         amount: payment.amount,
         currency: "INR",
         order_id: payment.id,
@@ -127,17 +129,17 @@ const getItemTotal = (item) => {
           console.log("Razorpay response:", response);
           try {
             const res = await axios.post(
-              "http://127.0.0.1:8000/api/order/create/",
+              `${API_BASE_URL}/api/order/create/`,
               orderData
             );
-            alert(res.data.message || "Order placed successfully!");
+            toast.success(res.data.message || "Order placed successfully!");
             setOrder((prev) => [...prev, orderData]);
             setCart([]);
             setProductQuantity({});
             setSuccess(true);
           } catch (backendError) {
             console.error("Failed to save UPI order on backend:", backendError);
-            alert(
+            toast.error(
               "Payment succeeded, but order save failed. Please contact support."
             );
           }
@@ -234,8 +236,8 @@ const getItemTotal = (item) => {
     }
 
     try {
-     const res= await axios.post('http://127.0.0.1:8000/api/order/create/', orderData);
-      alert(res.data.message || 'Order placed successfully!');
+     const res= await axios.post(`${API_BASE_URL}/api/order/create/`, orderData);
+      toast.success(res.data.message || 'Order placed successfully!');
     } catch (backendError) {
       console.error('COD order creation failed:', backendError);
       return;

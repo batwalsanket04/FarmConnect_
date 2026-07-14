@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { IndianRupee, Package, ShoppingCart, TrendingUp } from 'lucide-react'
+import { API_BASE_URL } from '../../utils/api';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
  
@@ -26,12 +27,12 @@ try{
       }
 
   // Fetch products
-  const productRes=await axios.get(`http://127.0.0.1:8000/api/farmer/products/${farmerId}/`);
+  const productRes=await axios.get(`${API_BASE_URL}/api/farmer/products/${farmerId}/`);
   setProduct(productRes.data);
 
   // Fetch dashboard stats
   const statsRes = await axios.get(
-    `http://127.0.0.1:8000/api/farmer/orders/dashboard-stats/${farmerId}/`
+    `${API_BASE_URL}/api/farmer/orders/dashboard-stats/${farmerId}/`
   );
 
   const stats = statsRes.data || {};

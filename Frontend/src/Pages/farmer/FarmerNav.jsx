@@ -1,7 +1,24 @@
-import React from 'react'
-import { Bell, Search, User } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { Search, User } from 'lucide-react'
+import { useAppContext } from '../../context/Context'
 
 const FarmerNav = () => {
+  const { searchTerm, setSearchTerm } = useAppContext();
+  const [localQuery, setLocalQuery] = useState(searchTerm);
+
+  useEffect(() => {
+    setLocalQuery(searchTerm)
+  }, [searchTerm])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localQuery !== searchTerm) {
+        setSearchTerm(localQuery)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [localQuery, searchTerm, setSearchTerm])
 
   const storedFarmer = localStorage.getItem("auth");
   console.log("Stored farmer data:", storedFarmer);
@@ -28,9 +45,15 @@ const FarmerNav = () => {
 
       <div className='flex items-center gap-4'>
 
-         
-        <div className=' p-2 rounded-full'>
-          <Search />
+        <div className='flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 w-36 md:w-56'>
+          <Search className='h-4 w-4 text-gray-500' />
+          <input
+            type='text'
+            value={localQuery}
+            onChange={(e) => setLocalQuery(e.target.value)}
+            placeholder='Search'
+            className='w-full bg-transparent text-sm outline-none text-emerald-900'
+          />
         </div>
 
         <h2 className="text-lg font-semibold text-emerald-700">

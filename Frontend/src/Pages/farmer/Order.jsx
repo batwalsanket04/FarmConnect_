@@ -10,6 +10,8 @@ import {
 
 import { useAppContext } from "../../context/Context";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { API_BASE_URL, assetUrl } from '../../utils/api';
 
 const Order = () => {
 
@@ -28,7 +30,7 @@ const Order = () => {
     
     try {
       const res = await axios.patch(
-        `http://127.0.0.1:8000/api/farmer/orders/update-status/${id}/`,
+        `${API_BASE_URL}/api/farmer/orders/update-status/${id}/`,
         { status: newStatus }
       );
       
@@ -42,7 +44,7 @@ const Order = () => {
       }
     } catch (error) {
       console.error('Failed to update order status:', error);
-      alert('Failed to update order status. Please try again.');
+      toast.error('Failed to update order status. Please try again.');
     } finally {
       setUpdating(prev => ({ ...prev, [id]: false }));
     }
@@ -66,7 +68,7 @@ const Order = () => {
         }
 
         const res = await axios.get(
-          `http://127.0.0.1:8000/api/farmer/orders/${farmerId}/`
+          `${API_BASE_URL}/api/farmer/orders/${farmerId}/`
         );
         
         if (res.status === 200) {
@@ -302,7 +304,7 @@ const Order = () => {
 
                         {product.image ? (
                           <img
-                            src={`http://127.0.0.1:8000${product.image}`}
+                            src={assetUrl(product.image)}
                             alt={product.name}
                             className="w-16 h-16 rounded-xl object-cover"
                             onError={(e) => {

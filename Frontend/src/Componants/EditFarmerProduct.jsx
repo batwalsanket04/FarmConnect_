@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const EditFarmerProduct = () => {
     const { id } = useParams();
@@ -21,7 +22,7 @@ const EditFarmerProduct = () => {
    useEffect(() => {
      const fetchProductDetails = async () => {
         try {
-            const res = await axios.get(`http://127.0.0.1:8000/api/farmer/product/${id}/`);
+            const res = await axios.get(`${API_BASE_URL}/api/farmer/product/${id}/`);
             const data = res.data || {};
             setProduct({
                 product_name: data.product_name || "",
@@ -34,7 +35,7 @@ const EditFarmerProduct = () => {
                 description: data.description || "",
                 product_image: data.product_image || null
             });
-            setImagePreview(data.product_image ? `http://127.0.0.1:8000${data.product_image}` : "");
+            setImagePreview(assetUrl(data.product_image));
             console.log("Fetched product details:", data);
         } catch (error) {
           console.error("Error fetching product details:", error);
@@ -86,7 +87,7 @@ const EditFarmerProduct = () => {
     }
 
     const res = await axios.put(
-      `http://127.0.0.1:8000/api/farmer/product/edit/${id}/`,
+      `${API_BASE_URL}/api/farmer/product/edit/${id}/`,
       formData,
       {
         headers: {
@@ -96,11 +97,12 @@ const EditFarmerProduct = () => {
     );
 
     console.log(res.data);
-    alert("Product updated successfully");
+    toast.success("Product updated successfully");
     nav(-1);
 
   } catch (error) {
     console.error(error.response?.data || error);
+    toast.error(error.response?.data?.error || "Something went wrong");
   }
 };
 

@@ -1,1 +1,41 @@
  @import "tailwindcss";
+
+/* Toastify theme overrides for FarmConnect */
+.Toastify__toast {
+  padding: 1rem 1rem 1rem 1rem;
+  border-radius: 1.125rem;
+  box-shadow: 0 14px 35px rgba(6, 78, 59, 0.18);
+}
+
+.Toastify__toast-body {
+  color: #f8fafc;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.Toastify__toast--success {
+  background: #047857;
+  color: #f8fafc;
+}
+
+.Toastify__toast--error {
+  background: #991b1b;
+  color: #f8fafc;
+}
+
+.Toastify__toast--info {
+  background: #0f766e;
+  color: #f8fafc;
+}
+
+.Toastify__toast--warning {
+  background: #92400e;
+  color: #f8fafc;
+}
+
+.Toastify__progress-bar {
+  background: #bbf7d0;
+}
+
+.Toastify__close-button {
+  color: rgba(248, 250, 252, 0.9);
+}

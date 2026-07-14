@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL, assetUrl } from '../../utils/api';
 import {
   User,
   Phone,
@@ -29,7 +30,7 @@ const ViewOrderDetail = () => {
 
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/api/farmer/orders/view-order/${id}/`
+          `${API_BASE_URL}/api/farmer/orders/view-order/${id}/`
         );
         console.log("Order details loaded:", res.data);
         setViewOrder(res.data);
@@ -197,7 +198,7 @@ const ViewOrderDetail = () => {
                   >
                     {item.image ? (
                       <img
-                        src={`http://127.0.0.1:8000${item.image}`}
+                        src={assetUrl(item.image)}
                         alt={item.name}
                         className="h-28 w-full shrink-0 rounded-3xl object-cover sm:w-32"
                         onError={(e) => {

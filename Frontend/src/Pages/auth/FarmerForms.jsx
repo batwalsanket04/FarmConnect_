@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { setStoredAuth } from "../../utils/auth";
+import { toast } from "react-toastify";
+import { API_BASE_URL } from '../../utils/api';
 
 const FarmerForms = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -47,47 +50,39 @@ const FarmerForms = () => {
       try{
         setLoading(true);
 
-      const url=isLogin?"http://127.0.0.1:8000/api/farmer/login/":"http://127.0.0.1:8000/api/farmer/register/";
+      const url=isLogin?`${API_BASE_URL}/api/farmer/login/`:`${API_BASE_URL}/api/farmer/register/`;
 
       const res=await axios.post(url,form);
-      console.log(res.data)
 
       if(res.status===200 || res.status===201)
       {
-        alert(res.data.message);
+        toast.success(res.data.message);
 
-        setForm
-        ({
-
-    farmer_name: "",
-    phone: "",
-    location: "",
-    email: "",
-    password: "",
-
+        setForm({
+          farmer_name: "",
+          phone: "",
+          location: "",
+          email: "",
+          password: "",
+          photo: null,
         });
 
         if(!isLogin)
         {
           setIsLogin(true);
-        
         }
         else
         {
           // Store auth data in a consistent format
           const authData = {
             token: res.data.access_token || res.data.token,
-            role: res.data.role || 'farmer', // Fallback to farmer if backend does not return role
+            refreshToken: res.data.refresh_token || res.data.refreshToken || '',
+            role: res.data.role || 'farmer',
             farmer: res.data.farmer
           };
-          
-          localStorage.setItem("auth", JSON.stringify(authData));
-          localStorage.setItem("farmer_id", res.data.farmer.id);
-          
-          // Optional: Also store token separately for backward compatibility
-          localStorage.setItem("farmerToken", authData.token);
-          localStorage.setItem("role", authData.role);
-          
+
+          setStoredAuth(authData);
+
           nav("/farmer-dashboard");
         }
       }
@@ -95,7 +90,9 @@ const FarmerForms = () => {
     }
     catch(error)
     {
-      setError(error.response?.data?.error || "Something went wrong");
+      const message = error.response?.data?.error || "Something went wrong";
+      setError(message);
+      toast.error(message);
     }
     finally
     {
@@ -107,8 +104,8 @@ const FarmerForms = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 flex items-center justify-center px-4">
-      <div className="w-full mt-2 mb-2 max-w-[350px] bg-white shadow-xl rounded-2xl p-4 border border-emerald-100">
+    <div className="min-h-screen bg-linear-to-br from-emerald-50 to-green-100 flex items-center justify-center px-4">
+      <div className="w-full mt-2 mb-2 max-w-87.5 bg-white shadow-xl rounded-2xl p-4 border border-emerald-100">
 
         {/* TOP */}
         <div className="text-center mb-5">
@@ -228,9 +225,16 @@ const FarmerForms = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 transition-all duration-300 text-white py-2 rounded-xl font-semibold shadow-lg"
+            className="w-full bg-emerald-600 text-white py-2 rounded-xl font-semibold flex items-center justify-center gap-2"
           >
-            {loading ? "Processing..." : (isLogin ? "Login" : "Create Account")}
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Processing...
+              </>
+            ) : (
+              isLogin ? "Login" : "Create Account"
+            )}
           </button>
 
         </form>
@@ -245,6 +249,14 @@ const FarmerForms = () => {
                 className="text-emerald-700 font-semibold cursor-pointer ml-1"
               >
                 Register
+              </span>
+              <br />
+              Forgot Password?
+              <span
+                onClick={() => nav('/forgot-password')}
+                className="text-emerald-700 font-semibold cursor-pointer ml-1"
+              >
+                Reset
               </span>
             </>
           ) : (

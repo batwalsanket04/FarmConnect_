@@ -2,15 +2,11 @@ import React from 'react'
 
 const Pegination = ({
   setCurrentpage,
-  farmerProduct
+  itemCount = 0
 }) => {
 
-  let Page_size = 4;
-
-  const total_pages = farmerProduct.length;
-   
-
-  const no_of_pages = Math.ceil(total_pages / Page_size);
+  const Page_size = 4;
+  const no_of_pages = Math.ceil(itemCount / Page_size);
 
   const handlePage = (n) => {
     setCurrentpage(n)

@@ -30,17 +30,17 @@ export default function Navbar() {
 
          <button
          onClick={()=>navigate('/farmer')}
- 
+
   className="hover:text-amber-300 transition duration-200"
 >
-  I am Farmer
+   Farmer
 </button>
 
 <button
   onClick={() => navigate('/')}
   className="bg-amber-400 text-emerald-900 px-4 py-2 rounded-lg hover:bg-amber-300 transition duration-200 shadow"
 >
-  I am Buyer
+   Buyer
 </button>
 
         </div>

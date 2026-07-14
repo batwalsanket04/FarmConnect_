@@ -1,36 +1,32 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
+import { getStoredAuth } from "../../utils/auth";
 
 const ProtectedRoutes = ({ children, allowedRole }) => {
   try {
-    const auth = JSON.parse(localStorage.getItem("auth"));
+    const auth = getStoredAuth();
 
-    // If not logged in
     if (!auth || !auth.token) {
-      console.warn("No authentication token found. Redirecting to home.");
       return <Navigate to="/" replace />;
     }
 
-    // If allowedRole is specified and user role doesn't match
     if (allowedRole) {
+      const normalizedRole = auth.role?.toString().trim().toLowerCase();
       const buyerRoles = ['user', 'customer', 'retailer', 'wholesaler'];
       const isBuyerRoute = allowedRole === 'user';
-      const hasBuyerRole = buyerRoles.includes(auth.role);
+      const hasBuyerRole = buyerRoles.includes(normalizedRole);
 
       if (isBuyerRoute && !hasBuyerRole) {
-        console.warn(`Access denied: Required buyer role, but auth role is '${auth.role}'`);
         return <Navigate to="/" replace />;
       }
 
-      if (!isBuyerRoute && auth.role !== allowedRole) {
-        console.warn(`Access denied: Required role '${allowedRole}', but user has role '${auth.role}'`);
+      if (!isBuyerRoute && normalizedRole !== allowedRole) {
         return <Navigate to="/" replace />;
       }
     }
 
     return children;
-  } catch (error) {
-    console.error("Error in ProtectedRoutes:", error);
+  } catch {
     return <Navigate to="/" replace />;
   }
 };

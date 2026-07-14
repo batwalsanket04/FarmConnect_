@@ -8,6 +8,7 @@ import {
   PhoneCall
 } from "lucide-react";
 import axios from "axios";
+import { API_BASE_URL, assetUrl } from '../../utils/api';
 
 const MyOrder = () => {
   const [orders, setOrders] = useState([]);
@@ -28,7 +29,7 @@ const MyOrder = () => {
         }
 
         const res = await axios.get(
-          `http://127.0.0.1:8000/api/user/products/${userId}/`
+          `${API_BASE_URL}/api/user/products/${userId}/`
         );
 
         console.log("Fetched orders:", res.data);
@@ -85,7 +86,7 @@ const MyOrder = () => {
               <img
                 src={
                   product.product_image
-                    ? `http://127.0.0.1:8000${product.product_image}`
+                    ? assetUrl(product.product_image)
                     : "https://via.placeholder.com/100"
                 }
                 alt={product.product_name}

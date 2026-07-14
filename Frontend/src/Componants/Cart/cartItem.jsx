@@ -15,7 +15,7 @@ const CartItem = ({
     <div className="bg-white rounded-3xl shadow-md p-4 flex flex-col sm:flex-row gap-5">
 
       <img
-        src={item.image}
+        src={`http://localhost:8000/${item.image}`}
         alt=""
         className="w-full sm:w-40 h-40 object-cover rounded-2xl"
       />

@@ -16,8 +16,10 @@ import {
   HomeIcon
 } from 'lucide-react'
 
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAppContext } from '../context/Context'
+import { clearStoredAuth } from '../utils/auth'
+import { API_BASE_URL } from '../utils/api'
 
 const Sidebar = ({ type = "farmer" }) => {
   const {cart ,productQuantity}=useAppContext();
@@ -27,15 +29,26 @@ const Sidebar = ({ type = "farmer" }) => {
   const navigate = useNavigate()
 
 
-  const logout = () => {
-
-  localStorage.removeItem("farmerToken");
-  localStorage.removeItem("userToken");
-  localStorage.removeItem("auth");
-
-  navigate("/");
-
-}
+  const logout = async () => {
+    try {
+      const auth = JSON.parse(localStorage.getItem('auth') || '{}');
+      if (auth?.token) {
+        await fetch(`${API_BASE_URL}/api/logout/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`,
+          },
+          body: JSON.stringify({ refresh_token: auth.refreshToken || '' }),
+        });
+      }
+    } catch {
+      // Ignore logout API errors and still clear local auth state
+    } finally {
+      clearStoredAuth();
+      navigate('/');
+    }
+  }
 
   return (
 

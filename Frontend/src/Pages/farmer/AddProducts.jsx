@@ -5,6 +5,8 @@ import {
 } from "lucide-react";
 import { useAppContext } from "../../context/Context";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { API_BASE_URL } from '../../utils/api';
 
 const AddProduct = () => {
 
@@ -62,7 +64,7 @@ const AddProduct = () => {
   console.log(addfarmerProduct)
 };
 
-const url= "http://127.0.0.1:8000/api/farmer/add-product/"
+const url= `${API_BASE_URL}/api/farmer/add-product/`
 
 const submitForm = async (e) => {
 
@@ -101,7 +103,7 @@ const submitForm = async (e) => {
       setfarmerProduct([...farmerProduct, res.data.product]);
     }
     console.log(res.data);
-    window.alert(res.data.message);
+    toast.success(res.data.message);
     setaddfarmerProduct({
 
        product_image: null,
@@ -122,7 +124,7 @@ const submitForm = async (e) => {
 
   console.log(error.response?.data);
 
-  window.alert(
+  toast.error(
     error.response?.data?.error || "Something went wrong"
   );
 

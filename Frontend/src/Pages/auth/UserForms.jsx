@@ -2,6 +2,9 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { setStoredAuth } from '../../utils/auth';
+import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../../utils/api';
 
 const UserForms = () => {
 
@@ -50,17 +53,15 @@ const UserForms = () => {
 
      try{
       const url=isLogin?
-        "http://127.0.0.1:8000/api/user/login/"
-      : "http://127.0.0.1:8000/api/user/register/";
+        `${API_BASE_URL}/api/user/login/`
+      : `${API_BASE_URL}/api/user/register/`;
 
 
       const res=await axios.post(url,form);
-    localStorage.setItem("token", res.data.access_token);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
 
       if(res.status===200 || res.status===201)
       {
-        alert(res.data.message);
+        toast.success(res.data.message);
 
         setForm({
           role: 'customer',
@@ -86,16 +87,13 @@ else
 
   const authData = {
     token: res.data.access_token || res.data.token,
+    refreshToken: res.data.refresh_token || res.data.refreshToken || '',
     role: normalizedRole,
     user: res.data.user,
-    userType: res.data.role || 'customer'
+    userType: (res.data.role || 'customer').toString().trim().toLowerCase()
   };
-  
-  localStorage.setItem("auth", JSON.stringify(authData));
-  
-  // Optional: Also store individual items for backward compatibility
-  localStorage.setItem("token", authData.token);
-  localStorage.setItem("role", authData.role);
+
+  setStoredAuth(authData);
 
   nav("/user-dashboard");
 }
@@ -104,7 +102,9 @@ else
      }
      catch(error)
      {
-      setError(error.response?.data?.error || "something went wrong" );
+      const message = error.response?.data?.error || "Something went wrong";
+      setError(message);
+      toast.error(message);
 
      } finally{
       setLoading(false)
@@ -114,9 +114,9 @@ else
   }
 
   return (
-    <div className='min-h-screen  bg-gradient-to-br from-emerald-50 to-green-100 flex items-center justify-center px-4'>
+    <div className='min-h-screen  bg-linear-to-br from-emerald-50 to-green-100 flex items-center justify-center px-4'>
 
-      <div className='w-full mt-2 mb-2 max-w-[350px] bg-white shadow-xl rounded-2xl p-4 border border-emerald-100'>
+      <div className='w-full mt-2 mb-2 max-w-87.5 bg-white shadow-xl rounded-2xl p-4 border border-emerald-100'>
 
         {/* TOP */}
         <div className='text-center mb-5'>
@@ -289,27 +289,37 @@ else
         {/* BOTTOM */}
         <p className='text-center text-sm text-gray-500 mt-4'>
 
-          {isLogin ? (
-            <>
-              Don&apos;t have an account?
-              <span
-                onClick={() => setIsLogin(false)}
-                className='text-emerald-700 font-semibold cursor-pointer ml-1'
-              >
-                Register
-              </span>
-            </>
-          ) : (
-            <>
-              Already have an account?
-              <span
-                onClick={() => setIsLogin(true)}
-                className='text-emerald-700 font-semibold cursor-pointer ml-1'
-              >
-                Login
-              </span>
-            </>
-          )}
+         {isLogin ? (
+  <>
+    Don&apos;t have an account?
+    <span
+      onClick={() => setIsLogin(false)}
+      className="text-emerald-700 font-semibold cursor-pointer ml-1"
+    >
+      Register
+    </span>
+
+    <br />
+
+    Forgot Password?
+    <span
+      onClick={() => nav("/forgot-password")}
+      className="text-emerald-700 font-semibold cursor-pointer ml-1"
+    >
+      Reset
+    </span>
+  </>
+) : (
+  <>
+    Already have an account?
+    <span
+      onClick={() => setIsLogin(true)}
+      className="text-emerald-700 font-semibold cursor-pointer ml-1"
+    >
+      Login
+    </span>
+  </>
+)}
 
         </p>
 

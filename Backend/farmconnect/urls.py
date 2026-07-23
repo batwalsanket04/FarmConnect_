@@ -3,7 +3,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from . import views
 
-urlpatterns = [ path('',views.home, name='home'),
+urlpatterns = [
+               path('',views.home, name='home'),
                #farmer Apis
                path('farmer/register/',views.Farmer_Register,),
                path('farmer/login/',views.Farmer_Login,),

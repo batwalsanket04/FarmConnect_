@@ -31,7 +31,7 @@ DATABASE_URL="postgresql://farmconnect_u007_user:YyYLkOiN6X629iSwqqVPWiJSKoJRNy6
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 

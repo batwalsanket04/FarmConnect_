@@ -127,10 +127,7 @@ const Products = ({ selectedCategory, currentPage, setCurrentpage }) => {
               <div className='p-4'>
                 <div className='flex items-center justify-between'>
                   <h3 className='font-semibold text-lg'>{product.name}</h3>
-                  <Heart
-                    className={`cursor-pointer ${likedProducts.has(product.id) ? 'text-red-500' : 'text-red-400'}`}
-                    onClick={(event) => toggleLike(product.id, event)}
-                  />
+                 
                 </div>
 
                 <p className='text-sm text-gray-500 mt-1'>{product.description}</p>

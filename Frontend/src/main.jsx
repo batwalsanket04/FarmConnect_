@@ -4,6 +4,10 @@ import './index.css'
 import App from './App.jsx'
 import AppContextProvider from './context/Context.jsx'
 import ErrorBoundary from './Componants/ErrorBoundary.jsx'
+import "@fontsource/poppins";
+import "@fontsource/inter";
+
+import "./index.css";
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

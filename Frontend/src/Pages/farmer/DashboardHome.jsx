@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { IndianRupee, Package, ShoppingCart, TrendingUp } from 'lucide-react'
+import { Construction, HandFist, HandHelping, IndianRupee, Package, ShoppingCart, Sprout, Tractor, TrendingUp, Wheat, WheatIcon } from 'lucide-react'
 import { API_BASE_URL } from '../../utils/api';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -75,8 +75,8 @@ fetchData();
 
           <div>
 
-            <h1 className='text-3xl font-bold text-emerald-700'>
-              Welcome Farmer 👋
+            <h1 className='text-3xl font-bold flex text-emerald-700'>
+              Welcome Farmer <span className='p-1'><Wheat className="text-yellow-500" size={30}/></span>
             </h1>
 
             <p className='text-gray-500 mt-1'>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Search, User } from 'lucide-react'
 import { useAppContext } from '../../context/Context'
+import logo from '../../assets/OIP.webp'
 
 const FarmerNav = () => {
   const { searchTerm, setSearchTerm } = useAppContext();
@@ -38,9 +39,9 @@ const FarmerNav = () => {
       '
     >
 
-      <h1 className='text-xl lg:text-2xl font-bold text-emerald-700'>
-        Farmer Dashboard
-      </h1>
+       <h1 className="text-xl md:text-2xl font-semibold tracking-wide flex items-center gap-2">
+                      <span className="text-amber-300"><img className="w-[60px] rounded-circle " src={logo} alt="" /></span> Farmer Dashboard
+             </h1>
 
 
       <div className='flex items-center gap-4'>
